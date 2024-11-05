@@ -123,29 +123,25 @@ local function updatePosition()
     end
     
     -- Логика, если персонаж не лазает
-    if not isClimbing then
-        if FightKickFlag == true then
-            local lookDirection = plrCharacter.HumanoidRootPart.CFrame.lookVector
-            if plrCharacter.Humanoid.MoveDirection.Magnitude > 0 then
-                plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame
-                - plrCharacter.Humanoid.MoveDirection * (24 / 134) * (plrCharacter.Humanoid.WalkSpeed/10)
-                + plrCharacter.Humanoid.MoveDirection * increment
-            else
-                plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame + lookDirection * increment
-            end
-            if increment < 0 then
-                increment = increment - 0.003
-            else
-                increment = increment + 0.003
-            end
-            increment = -increment
-            -- print("LookDirection:", lookDirection, "FPS:", fps, FightKickFlag)
-        elseif IsRunning() and plrCharacter.Humanoid.MoveDirection.Magnitude > 0 and plrCharacter.Blocking_Capacity.Value == 0 then
-            plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame + plrCharacter.Humanoid.MoveDirection * (24 / 134) * ADDTORUNSPEED/10
-            -- print("MoveDirection:", plrCharacter.Humanoid.MoveDirection, "FPS:", fps)
+    if FightKickFlag == true then
+        local lookDirection = plrCharacter.HumanoidRootPart.CFrame.lookVector
+        if plrCharacter.Humanoid.MoveDirection.Magnitude > 0 then
+            plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame
+            - plrCharacter.Humanoid.MoveDirection * (24 / 134) * (plrCharacter.Humanoid.WalkSpeed/10)
+            + plrCharacter.Humanoid.MoveDirection * increment
+        else
+            plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame + lookDirection * increment
         end
-    else
-        if UserInputService:IsKeyDown(Enum.KeyCode.W) and plrCharacter.Humanoid.WalkSpeed ~= 0 and plrCharacter.Blocking_Capacity.Value == 0 then
+        if increment < 0 then
+            increment = increment - 0.003
+        else
+            increment = increment + 0.003
+        end
+        increment = -increment
+    elseif IsRunning() and plrCharacter.Humanoid.MoveDirection.Magnitude > 0 and plrCharacter.Blocking_Capacity.Value == 0 then
+        if not isClimbing then
+            plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame + plrCharacter.Humanoid.MoveDirection * (24 / 134) * ADDTORUNSPEED/10
+        elseif UserInputService:IsKeyDown(Enum.KeyCode.W) then
             plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame + Vector3.new(0, (24 / 134) * ADDTORUNSPEED/10, 0)
         end
     end
@@ -161,10 +157,10 @@ local FightKick = function()
     FightKickFlag = true
     plr.DevEnableMouseLock = false
     UserInputService.MouseBehavior = Enum.MouseBehavior.Default
-    local function blockInput(actionName, inputState, inputObject)
-        return Enum.ContextActionResult.Sink -- Игнорируем весь ввод
-    end
-    ContextActionService:BindAction("BlockInput", blockInput, false, unpack(Enum.UserInputType:GetEnumItems()))
+    -- local function blockInput(actionName, inputState, inputObject)
+    --     return Enum.ContextActionResult.Sink -- Игнорируем весь ввод
+    -- end
+    -- ContextActionService:BindAction("BlockInput", blockInput, false, unpack(Enum.UserInputType:GetEnumItems()))
     while increment < 0.25 do
         RunService.Stepped:wait() 
         -- print(increment)
@@ -172,7 +168,7 @@ local FightKick = function()
     FightKickFlag = false
     wait(0.5)
     plr.DevEnableMouseLock = true
-    ContextActionService:UnbindAction("BlockInput")
+    -- ContextActionService:UnbindAction("BlockInput")
     increment = 0.1
 end
 
