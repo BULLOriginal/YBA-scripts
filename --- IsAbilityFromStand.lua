@@ -27,8 +27,9 @@ local AnchoreStand = function ()
 end
 AnchoreStand()
 
-print("\nWait(40)\n")
-wait(200)
+local w = 200
+print("200")
+wait(w)
 if StandPos then
     StandPos:Destroy()
     StandPos = nil
