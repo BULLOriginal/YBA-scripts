@@ -204,7 +204,7 @@ local ToggleStand = function (toggle)
                 }
             end
             if toggle == "Off" then
-                if not plrCharacter:FindFirstChild("StandMorph") then
+                if not plrCharacter.SummonedStand.Value then
                     return
                 end
                 args = {
@@ -225,22 +225,20 @@ local StandOnConnection
 StandOnConnection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if input.KeyCode == Enum.KeyCode.Q and not gameProcessed then
         if plrCharacter then
-            local stand = plrCharacter:FindFirstChild("StandMorph")
+            local standMorph = plrCharacter:FindFirstChild("StandMorph")
             local soundSearch
-            if stand then
-                for _, v in pairs(stand:GetDescendants()) do
+            if standMorph then
+                for _, v in pairs(standMorph:GetDescendants()) do
                     if v:isA("Sound") and v.SoundId == "rbxassetid://1438146024" then
                         soundSearch = true
                     end
                 end
             end
-            if (not stand or stand and soundSearch) then
+            local IsStand = plrCharacter.SummonedStand
+            if (not IsStand or IsStand and soundSearch) then
                 print("Enabling stand...")
-                while(plrCharacter:FindFirstChild("StandMorph")) do wait(0.1); print("waiting cd...") end
-                while plrCharacter and not plrCharacter:FindFirstChild("StandMorph") do
-                    ToggleStand("On")
-                    RunService.Stepped:Wait()
-                end
+                while(IsStand.Value) do wait(0.1); print("waiting cd...") end
+                while plrCharacter and not IsStand.Value do RunService.Stepped:Wait(); ToggleStand("On") end
             end
         end
     end
@@ -249,7 +247,7 @@ end)
 local BarrierConnection = game.Workspace.ChildAdded:Connect(function(descendant)
     if descendant.Name == "Emerald Barrier" then
         wait(0.1)
-        for i, v in pairs(descendant:GetChildren()) do
+        for _, v in pairs(descendant:GetChildren()) do
             if v.Name == "Part" then
                 v.Transparency = 0.475
             end
@@ -347,18 +345,6 @@ end)
 
 --- Макросы на спек
 local MacrosConnection
-local CustomStandKeyBinds = {
-    -- ["Enum.KeyCode.Z"] = "Chop",
-    -- ["Enum.KeyCode.X"] = "Impale",
-    -- ["Enum.KeyCode.T"] = "Time Skip",
-    -- ["Enum.KeyCode.U"] = "Epitaph",
-    -- ["Enum.KeyCode.Y"] = "Erase Time",
-}
-
-local CustomSpecKeyBinds  = {
-    -- ["Enum.KeyCode.Y"] = "Chop"
-}
-
 local TrueStandKeyBinds = {}
 local TrueSpecKeyBinds = {}
 local specItem
@@ -516,6 +502,7 @@ end
 local IsSkillUsing = {}
 local UseSkill = function (skill, A_1)
     if not skill then skill = "m" end
+    if FindKeyByValue(TrueStandKeyBinds, skill) and not plrCharacter.SummonedStand.Value then ToggleStand("On"); return end
     if not IsSkillUsing[skill] then
         IsSkillUsing[skill] = true
     else
