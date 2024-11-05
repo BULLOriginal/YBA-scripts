@@ -142,9 +142,9 @@ local function updatePosition()
         if not isClimbing then
             plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame + plrCharacter.Humanoid.MoveDirection * (24 / 136) * ADDTORUNSPEED/10
         elseif UserInputService:IsKeyDown(Enum.KeyCode.W) then
-            plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame + Vector3.new(0, (24 / 155) * ADDTORUNSPEED/10, 0)
+            plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame + Vector3.new(0, (24 / 165) * ADDTORUNSPEED/10, 0)
         elseif UserInputService:IsKeyDown(Enum.KeyCode.S) then
-            plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame - Vector3.new(0, (24 / 155) * ADDTORUNSPEED/10, 0)
+            plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame - Vector3.new(0, (24 / 165) * ADDTORUNSPEED/10, 0)
         end
     end
 end
