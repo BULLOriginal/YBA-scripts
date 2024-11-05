@@ -217,12 +217,21 @@ local CreateAim = function ()
     beam.Transparency = NumberSequence.new(0.85)
 end
 
-
-local OnCharacterAdded = function(character)
-    plrCharacter = character
+local AdjustHumanoidHpDistance = function ()
     local humanoid = plrCharacter:WaitForChild("Humanoid", 10)
     humanoid.HealthDisplayDistance = 100000
     humanoid.NameDisplayDistance = 100000
+end
+local ToNormalHumanoidHpDistance = function ()
+    local humanoid = plrCharacter:WaitForChild("Humanoid", 10)
+    humanoid.HealthDisplayDistance = 45
+    humanoid.NameDisplayDistance = 45
+end
+
+
+local OnCharacterAdded = function(character)
+    plrCharacter = character
+    AdjustHumanoidHpDistance()
     if AIM then
         CreateAim()
     end
@@ -972,6 +981,18 @@ local MarkersConnetion
 MarkersConnetion = RunService.Stepped:Connect(CreateMarkers)
 
 -------
+
+local HideOcean = function ()
+    if workspace.Map:FindFirstChild("IMPORTANT"):FindFirstChild("Ocean") then
+        workspace.Map:FindFirstChild("IMPORTANT"):FindFirstChild("Ocean").Size = Vector3.new(0.1,0.1,0.1)
+    end
+end
+HideOcean()
+local RestoreOcean = function ()
+    if workspace.Map:FindFirstChild("IMPORTANT"):FindFirstChild("Ocean") then
+        workspace.Map:FindFirstChild("IMPORTANT"):FindFirstChild("Ocean").Size = Vector3.new(1, 83.41999816894531, 1)
+    end
+end
 print("\nL для отключения (для включения потребуется перезапуск кода)\n")
 OnCharacterAdded(plrCharacter)
 local CharacterAddedConnection = plr.CharacterAdded:Connect(OnCharacterAdded)
@@ -981,6 +1002,9 @@ ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProc
         getgenv().IsValeraScriptRunning = false
         print("Скрипт выключен")
         
+        RestoreOcean()
+        ToNormalHumanoidHpDistance()
+
         if SpectatorConnection then
             SpectatorConnection:Disconnect()
             SpectatorConnection = nil
@@ -1045,9 +1069,7 @@ ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProc
         end
     end
 end)
-if workspace.Map:FindFirstChild("IMPORTANT"):FindFirstChild("Ocean") then
-    workspace.Map:FindFirstChild("IMPORTANT"):FindFirstChild("Ocean").Size = Vector3.new(0.1,0.1,0.1)
-end
+
 
 else
 print("Скрипт \"VALERA HUB\" уже запущен")
