@@ -37,7 +37,6 @@ local GetPing = function()
 end
 GetPingConnection = RunService.Stepped:Connect(GetPing)
 
-local TsGui
 -- local BuffRunConnect
 local AlwaysSprintingConnect
 local ClosestTsConnection
@@ -356,38 +355,41 @@ local FindTsing = function(position)
     return nil
 end
 
+local TsGui
 local CreateFrame = function (foundName)
-    if not TsGui then
+    if TsGui then
+        TsGui:Destroy()
+        TsGui = nil
+    end
     -- Получаем игрока и его экран (TsGui)
     local playerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
     -- Создаем ScreenTsGui
-        TsGui = Instance.new("ScreenGui")
-        TsGui.Parent = playerGui
-    
-        -- Создаем Frame
-        local frame = Instance.new("Frame")
-        frame.Size = UDim2.new(0.3, 0, 0.1, 0) -- Размер 30% ширины и 10% высоты экрана
-        frame.Position = UDim2.new(0.35, 0, 0, 0) -- Позиция сверху по центру
-        frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Цвет фона
-        frame.Parent = TsGui
-        -- Создаем текстовое поле с предложением
-        local textLabel = Instance.new("TextLabel")
-        textLabel.Size = UDim2.new(1, 0, 1, 0) -- Полный размер внутри фрейма
-        textLabel.Position = UDim2.new(0, 0, 0, 0)
-        textLabel.Text = foundName
-        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- Цвет текста
-        textLabel.BackgroundTransparency = 1 -- Прозрачный фон для текста
-        textLabel.Font = Enum.Font.SourceSans
-        textLabel.TextScaled = true -- Масштаб текста по размеру фрейма
-        textLabel.Parent = frame
-        print("TsGUI создан")
-        delay(4, function()
-            if TsGui then
-                TsGui:Destroy()
-                TsGui = nil
-            end
-        end)
-    end
+    TsGui = Instance.new("ScreenGui")
+    TsGui.Parent = playerGui
+
+    -- Создаем Frame
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0.3, 0, 0.1, 0) -- Размер 30% ширины и 10% высоты экрана
+    frame.Position = UDim2.new(0.35, 0, 0, 0) -- Позиция сверху по центру
+    frame.BackgroundColor3 = Color3.fromRGB(100, 0, 0) -- Цвет фона
+    frame.Parent = TsGui
+    -- Создаем текстовое поле с предложением
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Size = UDim2.new(1, 0, 1, 0) -- Полный размер внутри фрейма
+    textLabel.Position = UDim2.new(0, 0, 0, 0)
+    textLabel.Text = foundName
+    textLabel.TextColor3 = Color3.fromRGB(200, 200, 200) -- Цвет текста
+    textLabel.BackgroundTransparency = 1 -- Прозрачный фон для текста
+    textLabel.Font = Enum.Font.SourceSans
+    textLabel.TextScaled = true -- Масштаб текста по размеру фрейма
+    textLabel.Parent = frame
+    print("TsGUI создан")
+    delay(4, function()
+        while TsGui and RunService.Stepped:wait() do
+            TsGui:Destroy()
+            TsGui = nil
+        end
+    end)
 end
 
 ClosestTsConnection = RunService.Stepped:Connect(function ()
