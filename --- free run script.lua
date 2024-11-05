@@ -1,5 +1,5 @@
--- --- free run script
--- ---Добавить значение к СКОРОСТИ БЕГА (Меньше = меньше шанс кика)
+--- free run script
+---Добавить значение к СКОРОСТИ БЕГА (Меньше = меньше шанс кика)
 -- ADDTORUNSPEED = 12
 -- PETUHVIEW = true
 -- IMPALEGLITCHFLAG = true
@@ -8,7 +8,6 @@
 -- CHOOSEPOSE = "T-Pose"
 -- CHOOSESTANDPOSE = nil
 -- SpectatorKey = "J"
----
 if not getgenv().IsValeraScriptRunning then
 getgenv().IsValeraScriptRunning = true
 
@@ -982,14 +981,9 @@ MarkersConnetion = RunService.Stepped:Connect(CreateMarkers)
 
 -------
 
-local HideOcean = function ()
-    if workspace.Map:FindFirstChild("IMPORTANT"):FindFirstChild("Ocean") then
-        workspace.Map:FindFirstChild("IMPORTANT"):FindFirstChild("Ocean").Size = Vector3.new(0.1,0.1,0.1)
-    end
-end
-HideOcean()
+
 local RestoreOcean = function ()
-    if workspace.Map:FindFirstChild("IMPORTANT"):FindFirstChild("Ocean") then
+    if workspace.Map:FindFirstChild("IMPORTANT") and workspace.Map.IMPORTANT:FindFirstChild("Ocean") then
         workspace.Map:FindFirstChild("IMPORTANT"):FindFirstChild("Ocean").Size = Vector3.new(1, 83.41999816894531, 1)
     end
 end
@@ -1002,7 +996,7 @@ ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProc
         getgenv().IsValeraScriptRunning = false
         print("Скрипт выключен")
         
-        RestoreOcean()
+        
         ToNormalHumanoidHpDistance()
 
         if SpectatorConnection then
@@ -1062,14 +1056,20 @@ ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProc
             MacrosConnection:Disconnect()
             MacrosConnection = nil
         end
-
+        
         if ScriptConnection then
             ScriptConnection:Disconnect()
             ScriptConnection = nil
         end
+        RestoreOcean()
     end
 end)
-
+local HideOcean = function ()
+    if workspace.Map:FindFirstChild("IMPORTANT") and workspace.Map.IMPORTANT:FindFirstChild("Ocean") then
+        workspace.Map.IMPORTANT:FindFirstChild("Ocean").Size = Vector3.new(0.1,0.1,0.1)
+    end
+end
+HideOcean()
 
 else
 print("Скрипт \"VALERA HUB\" уже запущен")

@@ -187,7 +187,7 @@ local ForceStand = function ()
     local standMorph = plrCharacter:FindFirstChild("StandMorph")
     local StandPos
     if plrCharacter and standMorph then
-        local TargetLookDirection = Vector3.new(0, -1, 0) ---TargetCharacter.HumanoidRootPart.CFrame.lookVector
+        local TargetLookDirection = Vector3.new(0, -1, 0)
         local SHum = standMorph.HumanoidRootPart
         StandPos = Instance.new("BodyPosition", SHum)
         StandGyro = Instance.new("BodyGyro", SHum)
@@ -197,21 +197,22 @@ local ForceStand = function ()
         StandGyro.D = 100
         StandGyro.P = 100000
         StandPos.Position = plrCharacter.HumanoidRootPart.Position
-        RunService.Stepped:Wait()
+        -- RunService.Stepped:Wait()
         local bufOr = SHum.StandAttach.AlignOrientation.MaxTorque
         local bufForc = SHum.StandAttach.AlignPosition.MaxForce
-        print(bufOr, bufForc)
         SHum.StandAttach.AlignOrientation.MaxTorque = 100
         SHum.StandAttach.AlignPosition.MaxForce = 100
         StandPos.Position = TargetCharacter.HumanoidRootPart.Position - TargetLookDirection * 200
         StandGyro.MaxTorque = Vector3.new("inf","inf","inf")
         StandGyro.CFrame = CFrame.lookAt(SHum.Position - TargetLookDirection, SHum.Position + TargetLookDirection)
-        wait(0.2)
+        -- wait(0.2)
         if not StandPositionConnection then
             StandPositionConnection = RunService.Stepped:Connect(function()
                 local ping = Stats.PerformanceStats.Ping:GetValue()
                 local offset = TargetCharacter.HumanoidRootPart.Velocity.Magnitude * ping/1000 * PingOffsetMultiplayer
                 local MoveDirection = TargetCharacter:FindFirstChild("Humanoid").MoveDirection
+                SHum.Position = TargetCharacter.HumanoidRootPart.Position + MoveDirection  * offset * Vector3.new(1, 0, 1)
+                standMorph.LowerTorso.Position = TargetCharacter.HumanoidRootPart.Position + MoveDirection  * offset * Vector3.new(1, 0, 1)
                 StandPos.Position = TargetCharacter.HumanoidRootPart.Position + MoveDirection  * offset * Vector3.new(1, 0, 1)
             end)
         end
