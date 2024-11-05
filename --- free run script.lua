@@ -144,6 +144,7 @@ local function updatePosition()
         elseif UserInputService:IsKeyDown(Enum.KeyCode.W) then
             plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame + Vector3.new(0, (24 / 134) * ADDTORUNSPEED/10, 0)
         elseif UserInputService:IsKeyDown(Enum.KeyCode.S) then
+            print("DOWN")
             plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame - Vector3.new(0, (24 / 134) * ADDTORUNSPEED/10, 0)
         end
     end
