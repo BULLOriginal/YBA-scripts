@@ -1,12 +1,13 @@
 -- --- free run script
 -- ---Добавить значение к СКОРОСТИ БЕГА (Меньше = меньше шанс кика)
--- local ADDTORUNSPEED = 12
--- local PETUHVIEW = true
--- local IMPALEGLITCHFLAG = true
--- local MARKERRENDERDISTANCE = 200 --- 0 для отключения
--- local AIM = true
--- local CHOOSEPOSE = "T-Pose"
--- local CHOOSESTANDPOSE
+-- ADDTORUNSPEED = 12
+-- PETUHVIEW = true
+-- IMPALEGLITCHFLAG = true
+-- MARKERRENDERDISTANCE = 200 --- 0 для отключения
+-- AIM = true
+-- CHOOSEPOSE = "T-Pose"
+-- CHOOSESTANDPOSE = nil
+-- SpectatorKey = "J"
 ---
 if not getgenv().IsValeraScriptRunning then
 getgenv().IsValeraScriptRunning = true
@@ -19,7 +20,7 @@ local Workspace = game:GetService("Workspace")
 local Stats = game:GetService("Stats")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local living = Workspace.Living
+local living = Workspace:WaitForChild("Living",10)
 local animDir = ReplicatedStorage:WaitForChild("Anims",10)
 if not animDir then
     print("RESTART SCRIPT")
@@ -53,6 +54,50 @@ local IsRunning = function ()
     end
     return false
 end
+
+local GetClosestPlayerFromCursor = function()
+	local closestplr
+    local closestpos = 100000
+    for _,v in pairs(Players:GetPlayers()) do
+        if v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Name ~= plr.Name then
+            local mag = (IYMouse.Hit.p - v.Character.HumanoidRootPart.CFrame.Position).Magnitude
+            if mag < closestpos then
+                closestplr = v
+                closestpos = mag
+            end
+        end
+    end
+    print(closestplr.Name)
+	return closestplr
+end
+
+local TeleportCamera = function (targetCharacter)
+    local targetHRP = targetCharacter:FindFirstChild("LowerTorso")
+    local targetHumanoid = targetCharacter:FindFirstChild("Humanoid")
+    if targetHumanoid then
+        RunService:BindToRenderStep("TeleportCameraConnection", 1, function()
+            if targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart") then
+                camera.CameraSubject = targetHRP
+            else
+                RunService:UnbindFromRenderStep("TeleportCameraConnection")
+                camera.CameraSubject = plrCharacter.Humanoid
+            end
+        end)
+    end
+end
+
+local spectatorFlag = false
+local SpectatorConnection
+SpectatorConnection = UserInputService.InputBegan:Connect(function (input, gameProcessed)
+    if input.KeyCode == Enum.KeyCode[SpectatorKey] and not gameProcessed then
+        if not spectatorFlag then
+            TeleportCamera (GetClosestPlayerFromCursor().Character)
+        else
+            RunService:UnbindFromRenderStep("TeleportCameraConnection")
+        end
+        spectatorFlag = not spectatorFlag
+    end
+end)
 
 local StartSprinting = function()
     if plrCharacter and plrCharacter:FindFirstChild("RemoteFunction") then
@@ -175,7 +220,9 @@ end
 
 local OnCharacterAdded = function(character)
     plrCharacter = character
-
+    local humanoid = plrCharacter:WaitForChild("Humanoid", 10)
+    humanoid.HealthDisplayDistance = 100000
+    humanoid.NameDisplayDistance = 100000
     if AIM then
         CreateAim()
     end
@@ -455,21 +502,7 @@ local AimHelpSkillsList = {
     }
 
 
-local GetClosestPlayerFromCursor = function()
-	local closestplr
-    local closestpos = 100000
-    for i,v in pairs(Players:GetPlayers()) do
-        if v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Name ~= plr.Name then
-            local mag = (IYMouse.Hit.p - v.Character.HumanoidRootPart.CFrame.Position).Magnitude
-            if mag < closestpos then
-                closestplr = v
-                closestpos = mag
-            end
-        end
-    end
-    print(closestplr.Name)
-	return closestplr
-end
+
 local TeleportCamera = function (targetCharacter)
     local targetHRP = targetCharacter:FindFirstChild("LowerTorso")
     local targetHumanoid = targetCharacter:FindFirstChild("Humanoid")
@@ -948,6 +981,11 @@ ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProc
         getgenv().IsValeraScriptRunning = false
         print("Скрипт выключен")
         
+        if SpectatorConnection then
+            SpectatorConnection:Disconnect()
+            SpectatorConnection = nil
+        end
+
         DestroyAim()
 
         if MarkersConnetion then
