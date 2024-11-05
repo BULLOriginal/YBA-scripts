@@ -1,0 +1,75 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Robojini/Tuturial_UI_Library/main/UI_Template_1"))()
+
+local Window = Library.CreateLib("Name", "RJTheme3") 
+local Tab = Window:NewTab("TabName")
+local Section = Tab:NewSection("Section Name")
+
+local plr = game:GetService("Players").LocalPlayer
+for i,v in pairs(game:GetService("Workspace").Living:GetChildren()) do
+    if v.Name == plr.Name then
+        local_plr_living = v --local name obtain
+        break
+    end
+end
+
+function Compare_V(a, b)
+	local x1 = a.X
+	local x2 = b.X
+	local y1 = a.Y
+	local y2 = b.Y
+	local z1 = a.Z
+	local z2 = b.Z
+	local V1 = x1 * y1 * z1
+	local V2 = x2 * y2 * z2
+	wait(0.01)
+	-- if x2 > y2 * 7 or x2 > z2 * 7 then
+	-- 	if x1 > x2 then
+	-- 		return true
+	-- 	end
+	-- end
+
+	-- if y2 > x2 * 7 or y2 > z2 * 7 then
+	-- 	if y1 > y2 then
+	-- 		return true
+	-- 	end
+	-- end
+
+	-- if z2 > y2 * 7 or z2 > x2 * 7 then
+	-- 	if z1 > z2 then
+	-- 		return true
+	-- 	end
+	-- end
+
+	if V1 > V2 then
+		return true
+	else
+		return false
+	end
+end
+
+
+local GlobTest
+Section:NewToggle("Test", "", function(Test)
+    GlobTest = Test
+    if GlobTest then
+        print("ScrPilot is On")
+    end
+	while GlobTest do
+		wait(0.01)
+		for i,v in pairs(game:GetService("Workspace").Living:FindFirstChild(plr.Name):GetDescendants()) do
+			if v.Name == 'OriginalSize' then -- and v.Parent.Name == "Head"
+				if Compare_V(v.Value, v.Parent.Size) then
+					for i,m in pairs(v:GetDescendants()) do
+						if m.Name == 'OriginalSize' then
+							m:Destroy()
+						end
+					end
+				end
+			end
+		end
+		if not GlobTest then
+			print("ScrPilot is Off")
+			break
+		end
+	end
+end)
