@@ -1,12 +1,12 @@
---- free run script
----Добавить значение к СКОРОСТИ БЕГА (Меньше = меньше шанс кика)
-local ADDTORUNSPEED = 12
-local PETUHVIEW = true
-local IMPALEGLITCHFLAG = true
-local MARKERRENDERDISTANCE = 200 --- 0 для отключения
-local AIM = true
-local CHOOSEPOSE = "T-Pose"
-local CHOOSESTANDPOSE
+-- --- free run script
+-- ---Добавить значение к СКОРОСТИ БЕГА (Меньше = меньше шанс кика)
+-- local ADDTORUNSPEED = 12
+-- local PETUHVIEW = true
+-- local IMPALEGLITCHFLAG = true
+-- local MARKERRENDERDISTANCE = 200 --- 0 для отключения
+-- local AIM = true
+-- local CHOOSEPOSE = "T-Pose"
+-- local CHOOSESTANDPOSE
 ---
 if not getgenv().IsValeraScriptRunning then
 getgenv().IsValeraScriptRunning = true
