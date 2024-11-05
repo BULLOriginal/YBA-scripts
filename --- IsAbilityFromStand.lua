@@ -26,19 +26,14 @@ local AnchoreStand = function ()
 end
 AnchoreStand()
 
-print("\nL для отключения (для включения потребуется перезапуск кода)\n")
-local ScriptConnection
-ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProcessed)
-    if input.KeyCode == Enum.KeyCode[ScriptOffKey] and not gameProcessed then
-        print("Скрипт выключен")
+print("\nWait(40)\n")
+wait(40)
+if StandPos then
+    StandPos:Destroy()
+    StandPos = nil
+end
+if StandPositionConnection then
+    StandPositionConnection:Disconnect()
+    StandPositionConnection = nil
+end
 
-        if StandPos then
-            StandPos:Destroy()
-            StandPos = nil
-        end
-        if ScriptConnection then
-            ScriptConnection:Disconnect()
-            ScriptConnection = nil
-        end
-    end
-end)
