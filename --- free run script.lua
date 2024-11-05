@@ -127,7 +127,7 @@ local function updatePosition()
         local lookDirection = plrCharacter.HumanoidRootPart.CFrame.lookVector
         if plrCharacter.Humanoid.MoveDirection.Magnitude > 0 then
             plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame
-            - plrCharacter.Humanoid.MoveDirection * (24 / 135) * (plrCharacter.Humanoid.WalkSpeed/10)
+            - plrCharacter.Humanoid.MoveDirection * (24 / 136) * (plrCharacter.Humanoid.WalkSpeed/10)
             + plrCharacter.Humanoid.MoveDirection * increment
         else
             plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame + lookDirection * increment
@@ -140,11 +140,11 @@ local function updatePosition()
         increment = -increment
     elseif IsRunning() and plrCharacter.Humanoid.MoveDirection.Magnitude > 0 and plrCharacter.Blocking_Capacity.Value == 0 then
         if not isClimbing then
-            plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame + plrCharacter.Humanoid.MoveDirection * (24 / 135) * ADDTORUNSPEED/10
+            plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame + plrCharacter.Humanoid.MoveDirection * (24 / 136) * ADDTORUNSPEED/10
         elseif UserInputService:IsKeyDown(Enum.KeyCode.W) then
-            plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame + Vector3.new(0, (24 / 135) * ADDTORUNSPEED/10, 0)
+            plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame + Vector3.new(0, (24 / 136) * ADDTORUNSPEED/10, 0)
         elseif UserInputService:IsKeyDown(Enum.KeyCode.S) then
-            plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame - Vector3.new(0, (24 / 135) * ADDTORUNSPEED/10, 0)
+            plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame - Vector3.new(0, (24 / 136) * ADDTORUNSPEED/10, 0)
         end
     end
 end
