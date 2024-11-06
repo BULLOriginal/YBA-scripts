@@ -133,6 +133,7 @@ else
     end
     local OnTargetAdded = function (character)
         TargetCharacter = character
+        wait(1)
         CutBodyPart(TargetCharacter, TPPART)
     end
     local OnCharacterAdded = function (character)

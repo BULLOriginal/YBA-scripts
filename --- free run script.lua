@@ -65,8 +65,8 @@ local GetClosestPlayerFromCursor = function()
             end
         end
     end
-    print(closestplr.Name)
-	return closestplr
+    if closestplr then print(closestplr.Name); return closestplr;
+    else print("No closest players found") return end
 end
 
 local TeleportCamera = function (targetCharacter)
