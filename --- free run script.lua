@@ -978,6 +978,137 @@ local CreateMarkers = function()
 end
 local MarkersConnetion
 MarkersConnetion = RunService.Stepped:Connect(CreateMarkers)
+---
+
+-- Класс Indicators
+Indicators = {}
+Indicators.__index = Indicators
+
+-- Таблица для хранения всех индикаторов
+Indicators.indicators = {}
+
+-- Конструктор
+function Indicators.new()
+    local self = setmetatable({}, Indicators)
+    return self
+end
+
+local indicators = Indicators.new()
+
+-- Удаление индикатора для конкретного игрока
+function Indicators:Delete(player)
+    local indicator = self.indicators[player]
+    if indicator then
+        indicator.gui:Destroy()
+        self.indicators[player] = nil
+    else
+        warn("Indicator for this player does not exist!")
+    end
+end
+
+-- Обновление прогресса оставшегося времени
+function Indicators:UpdateProgress(player)
+    local indicator = self.indicators[player]
+    if indicator then
+        local elapsedTime = tick() - indicator.startTime
+        local greenTime = 3  -- Время для зеленой полоски
+        local redTime = 2    -- Время для красной полоски
+
+        -- Обновляем размер зеленой полоски, уменьшая её с обоих концов
+        local greenProgress = math.clamp((greenTime - elapsedTime) / greenTime, 0, 1)
+        indicator.greenBar.Size = UDim2.new(greenProgress, 0, 0.3, 0)
+        indicator.greenBar.Position = UDim2.new(0.5, 0, 0.5, 0)
+
+        -- Обновляем размер красной полоски, уменьшая её с обоих концов
+        local redProgress = math.clamp((redTime - elapsedTime) / redTime, 0, 1)
+        indicator.redBar.Size = UDim2.new(redProgress * 0.66, 0, 0.3, 0) -- Уменьшаем до 66% ширины
+        indicator.redBar.Position = UDim2.new(0.5, 0, 0.5, 0)
+
+        -- Удаление индикатора, когда время истекло
+        if elapsedTime >= greenTime or not player then
+            self:Delete(player)
+        end
+    end
+end
+
+
+-- Создание индикатора для игрока
+function Indicators:Create(player)
+    if self.indicators[player] then
+        warn("Indicator for this player already exists!")
+        return
+    end
+    
+    -- Создаем BillboardGui и настраиваем его
+    local billboardGui = Instance.new("BillboardGui")
+    billboardGui.Size = UDim2.new(10, 0, 5, 0)
+    billboardGui.StudsOffset = Vector3.new(0, 3, 0)
+    billboardGui.AlwaysOnTop = true
+    
+    -- Зеленая полоска для 3 секунд, укорачивается с обоих концов
+    local greenBar = Instance.new("Frame", billboardGui)
+    greenBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)  -- Зеленый цвет
+    greenBar.AnchorPoint = Vector2.new(0.5, 0.5)
+    greenBar.Position = UDim2.new(0.5, 0, 0.5, 0)         -- Центрируем полоску
+    greenBar.BorderSizePixel = 0
+
+    -- Красная полоска для 1 секунды, укорачивается с обоих концов быстрее
+    local redBar = Instance.new("Frame", billboardGui)
+    redBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)    -- Красный цвет
+    redBar.AnchorPoint = Vector2.new(0.5, 0.5)
+    redBar.Position = UDim2.new(0.5, 0, 0.5, 0)           -- Центрируем полоску
+    redBar.BorderSizePixel = 0
+
+    -- Устанавливаем BillboardGui на игрока
+    billboardGui.Parent = player:FindFirstChild("Head")
+    
+    -- Сохраняем индикатор в таблицу
+    self.indicators[player] = {gui = billboardGui, greenBar = greenBar, redBar = redBar, startTime = tick()}
+
+    local Connection
+    Connection = RunService.Stepped:Connect(function ()
+        indicators:UpdateProgress(player)
+    end)
+
+end
+
+-- Удаление всех индикаторов
+function Indicators:DeleteAll()
+    for player, indicator in pairs(self.indicators) do
+        indicator.gui:Destroy()
+        self.indicators[player] = nil
+    end
+end
+
+local IsInStun = function (playerCharacter)
+    if playerCharacter:GetAttribute("StunnedEffect") then return true end
+    return false
+end
+local IsBlockBreak = function (playerCharacter)
+    if playerCharacter:FindFirstChild("UpperTorso") and
+    playerCharacter.UpperTorso:FindFirstChild("HitAttach") and
+    playerCharacter.UpperTorso.HitAttach:FindFirstChild("10") then
+        return true
+    end
+    return false
+end
+
+local StunnedPlayersList = {}
+local BlockBreakListening = function ()
+    for _, v in pairs(living:GetChildren()) do
+        if IsInStun(v) then
+            if IsBlockBreak(v) then
+                indicators:Create(v)
+            end
+            if not StunnedPlayersList[v.Name] then StunnedPlayersList[v.Name] = true end
+        elseif StunnedPlayersList[v.Name] then
+            StunnedPlayersList[v.Name] = nil
+        end
+    end
+end
+local BlockBreakListeningConnection
+BlockBreakListeningConnection = RunService.Stepped:Connect(BlockBreakListening)
+
 
 -------
 
@@ -995,7 +1126,12 @@ ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProc
     if input.KeyCode == Enum.KeyCode.L and not gameProcessed then
         getgenv().IsValeraScriptRunning = false
         print("Скрипт выключен")
-        
+        indicators:DeleteAll()
+
+        if BlockBreakListeningConnection then
+            BlockBreakListeningConnection:Disconnect()
+            BlockBreakListeningConnection = nil
+        end
         
         ToNormalHumanoidHpDistance()
 
