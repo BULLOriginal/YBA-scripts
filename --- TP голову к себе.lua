@@ -110,6 +110,7 @@ if not Targetplr then
     for _, v in pairs(Players:GetChildren()) do
         if v.Name ~= plr.Name then
             Targetplr = v
+            print("Игрок не найден, взят первый игрок", v.Name)
             break
         end
     end
