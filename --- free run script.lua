@@ -1,16 +1,55 @@
 --- free run script
 ---Добавить значение к СКОРОСТИ БЕГА (Меньше = меньше шанс кика)
-local ADDTORUNSPEED = ADDTORUNSPEED: number or               12
-local PETUHVIEW = PETUHVIEW: boolean  or                       true
-local IMPALEGLITCHFLAG = IMPALEGLITCHFLAG: boolean or         true
-local MARKERRENDERDISTANCE = MARKERRENDERDISTANCE: number or 200 --- 0 для отключения
-local AIM = AIM: boolean or                                   true
-local CHOOSEPOSE = CHOOSEPOSE: string or                    "T-Pose"
-local CHOOSESTANDPOSE = CHOOSESTANDPOSE: string or           nil
-local SpectatorKey = SpectatorKey: string or                 "J"
-local FATPLAYERS = FATPLAYERS: boolean or                     true
-local THINFRIENDS = THINFRIENDS: boolean or                   true
-local MARKERTOGGLE = MARKERTOGGLE: boolean or                 true
+
+-- PETUHVIEW = true
+-- IMPALEGLITCHFLAG = true
+-- FATPLAYERS = true
+-- THINFRIENDS = true
+-- MARKERTOGGLE = false
+-- AIM = true
+-- ADDTORUNSPEED = 11
+-- MARKERRENDERDISTANCE = 200
+-- CHOOSEPOSE = "T-Pose"
+-- CHOOSESTANDPOSE = nil
+-- SpectatorKey = "J"
+
+if PETUHVIEW: boolean == nil then
+    PETUHVIEW = true
+end
+if IMPALEGLITCHFLAG: boolean == nil then
+    IMPALEGLITCHFLAG = true
+end
+if FATPLAYERS: boolean == nil then
+    FATPLAYERS = true
+end
+if THINFRIENDS: boolean == nil then
+    THINFRIENDS = true
+end
+if MARKERTOGGLE: boolean == nil then
+    MARKERTOGGLE = true
+end
+if AIM: boolean == nil then
+    AIM = true
+end
+
+if ADDTORUNSPEED: number == nil then
+    ADDTORUNSPEED = 11
+end
+if MARKERRENDERDISTANCE: number == nil then
+    MARKERRENDERDISTANCE = 200
+end
+
+if CHOOSEPOSE: string == nil then
+    CHOOSEPOSE = "T-Pose"
+end
+if CHOOSESTANDPOSE: string == nil then
+    CHOOSESTANDPOSE = CHOOSEPOSE
+end
+if SpectatorKey: string == nil then
+    SpectatorKey = "J"
+end
+
+
 if not getgenv().IsValeraScriptRunning then
 getgenv().IsValeraScriptRunning = true
 
@@ -46,9 +85,6 @@ local FightKickFlag = false
 
 
 --- L - отключить скрипт
-if not CHOOSESTANDPOSE then
-    CHOOSESTANDPOSE = CHOOSEPOSE
-end
 local IsRunning = function ()
     if plrCharacter:GetAttribute("Sprinting") then
         return true
