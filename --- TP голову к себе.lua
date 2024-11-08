@@ -100,8 +100,9 @@ end
 TARGETNAME = getPlayer(TARGETNAME)
 local plr = Players.LocalPlayer
 local plrCharacter = plr.Character
+local Targetplr
 if TARGETNAME then
-    local Targetplr = Players:FindFirstChild(TARGETNAME)
+    Targetplr = Players:FindFirstChild(TARGETNAME)
 end
 local TargetCharacter
 local TargetTpConnection
