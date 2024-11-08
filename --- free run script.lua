@@ -355,8 +355,7 @@ end
 local TsGui
 local CreateFrame = function (foundName)
     if TsGui then
-        TsGui:Destroy()
-        TsGui = nil
+        return
     end
     -- Получаем игрока и его экран (TsGui)
     local playerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
