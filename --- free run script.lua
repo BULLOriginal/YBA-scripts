@@ -967,8 +967,10 @@ local DestroyMarkers = function ()
 end
 local CreateMarkers = function()
 	for _, plyr in ipairs(living:GetChildren()) do
-        if plyr and plyr:FindFirstChild("HumanoidRootPart") then
-            local playerPosition = plyr.HumanoidRootPart.Position
+        local humanoidRootPart
+        if plyr then humanoidRootPart = plyr:FindFirstChild("HumanoidRootPart") end
+        if humanoidRootPart then
+            local playerPosition = humanoidRootPart.Position
             local distance = (playerPosition - plrCharacter.HumanoidRootPart.Position).Magnitude
             if plyr.Name ~= plr.Name and distance < MARKERRENDERDISTANCE and not Markers[plyr.Name] then
                 CreateMarker(plyr)
