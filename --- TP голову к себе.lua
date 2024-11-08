@@ -5,7 +5,8 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 --------------------------
 local TARGETNAME = TARGETNAME or "Black"
-local TPPART     = TPPART or "Head"
+local TPPART     = TPPART or "LeftUpperArm"
+local TPPARTSIZE = 3
 local SCRIPTOFFKEY = SCRIPTOFFKEY or "K"
 -------------------------
 local function getPlayer(list,speaker)
@@ -125,6 +126,7 @@ else
         local part
         if target and target:FindFirstChild(partName) then
             part = target:FindFirstChild(partName)
+            part.Size = part.OriginalSize.Value
             for _, v in pairs(part:GetChildren()) do
                 if v:IsA("Motor6D") then
                     v.Enabled = true
@@ -148,7 +150,9 @@ else
     local TpTarget = function ()
         if TargetCharacter and plrCharacter and 
         plrCharacter:FindFirstChild("HumanoidRootPart") then
-            TargetCharacter:FindFirstChild(TPPART).CFrame = plrCharacter.HumanoidRootPart.CFrame * CFrame.new(0,0,-15)
+            local part = TargetCharacter:FindFirstChild(TPPART)
+            part.CFrame = plrCharacter.HumanoidRootPart.CFrame * CFrame.new(0,0,-15)
+            part.Size = Vector3.new(TPPARTSIZE, TPPARTSIZE, TPPARTSIZE)
         end
     end
     local OnTargetAdded = function (character)

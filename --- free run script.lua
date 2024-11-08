@@ -1,13 +1,16 @@
 --- free run script
 ---Добавить значение к СКОРОСТИ БЕГА (Меньше = меньше шанс кика)
--- ADDTORUNSPEED = 12
--- PETUHVIEW = true
--- IMPALEGLITCHFLAG = true
--- MARKERRENDERDISTANCE = 200 --- 0 для отключения
--- AIM = true
--- CHOOSEPOSE = "T-Pose"
--- CHOOSESTANDPOSE = nil
--- SpectatorKey = "J"
+local ADDTORUNSPEED = ADDTORUNSPEED or               12
+local PETUHVIEW = PETUHVIEW or                       true
+local IMPALEGLITCHFLAG = IMPALEGLITCHFLAG or         true
+local MARKERRENDERDISTANCE = MARKERRENDERDISTANCE or 200 --- 0 для отключения
+local AIM = AIM or                                   true
+local CHOOSEPOSE = CHOOSEPOSE or                    "T-Pose"
+local CHOOSESTANDPOSE = CHOOSESTANDPOSE or           nil
+local SpectatorKey = SpectatorKey or                 "J"
+local FATPLAYERS = FATPLAYERS or                     true
+local THINFRIENDS = THINFRIENDS or                   true
+local MARKERTOGGLE = MARKERTOGGLE or                 true
 if not getgenv().IsValeraScriptRunning then
 getgenv().IsValeraScriptRunning = true
 
@@ -975,7 +978,7 @@ local CreateMarkers = function()
         if humanoidRootPart and plrCharacter and plrCharacter:FindFirstChild("HumanoidRootPart") then
             local playerPosition = humanoidRootPart.Position
             local distance = (playerPosition - plrCharacter.HumanoidRootPart.Position).Magnitude
-            if plyr.Name ~= plr.Name and distance < MARKERRENDERDISTANCE and not Markers[plyr.Name] then
+            if plyr.Name ~= plr.Name and distance < MARKERRENDERDISTANCE and not Markers[plyr.Name] and MARKERTOGGLE then
                 CreateMarker(plyr)
             end
         end
