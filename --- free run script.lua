@@ -278,16 +278,18 @@ StandOnConnection = UserInputService.InputBegan:Connect(function(input, gameProc
     if input.KeyCode == Enum.KeyCode.Q and not gameProcessed then
         if plrCharacter then
             local standMorph = plrCharacter:FindFirstChild("StandMorph")
-            local soundSearch
+            local soundFound
+            local IsStand = plrCharacter.SummonedStand
             if standMorph then
                 for _, v in pairs(standMorph:GetDescendants()) do
+                    if not IsStand.Value then break end
                     if v:isA("Sound") and v.SoundId == "rbxassetid://1438146024" then
-                        soundSearch = true
+                        soundFound = true
+                        break
                     end
                 end
             end
-            local IsStand = plrCharacter.SummonedStand
-            if (not IsStand or IsStand and soundSearch) then
+            if (not IsStand or IsStand and soundFound) then
                 print("Enabling stand...")
                 while(IsStand.Value) do wait(0.1); print("waiting cd...") end
                 while plrCharacter and not IsStand.Value do RunService.Stepped:Wait(); ToggleStand("On") end
