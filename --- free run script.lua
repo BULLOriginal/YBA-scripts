@@ -1098,17 +1098,11 @@ local IsBlockBreak = function (playerCharacter)
     return false
 end
 
-local StunnedPlayersList = {}
 local BlockBreakListening = function ()
     for _, v in pairs(living:GetChildren()) do
         local stunned = IsInStun(v)
-        if stunned and not StunnedPlayersList[v.Name] then
-            if IsBlockBreak(v) then
-                indicators:Create(v)
-            end
-            StunnedPlayersList[v.Name] = true
-        elseif not stunned and StunnedPlayersList[v.Name] then
-            StunnedPlayersList[v.Name] = nil
+        if stunned and IsBlockBreak(v) then
+            indicators:Create(v)
         end
     end
 end
