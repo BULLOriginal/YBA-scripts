@@ -4,8 +4,9 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 --------------------------
-local TARGETNAME = "itzegor4ik"
-local TPPART     = "Head"
+local TARGETNAME = TARGETNAME or "Black"
+local TPPART     = TPPART or "Head"
+local SCRIPTOFFKEY = SCRIPTOFFKEY or "K"
 -------------------------
 local function getPlayer(list,speaker)
     function splitString(str,delim)
@@ -99,13 +100,17 @@ end
 TARGETNAME = getPlayer(TARGETNAME)
 local plr = Players.LocalPlayer
 local plrCharacter = plr.Character
-local Targetplr
+if TARGETNAME then
+    local Targetplr = Players:FindFirstChild(TARGETNAME)
+end
 local TargetCharacter
 local TargetTpConnection
-for _, v in pairs(Players:GetChildren()) do
-    if v.Name ~= plr.Name then
-        Targetplr = v
-        break
+if not Targetplr then
+    for _, v in pairs(Players:GetChildren()) do
+        if v.Name ~= plr.Name then
+            Targetplr = v
+            break
+        end
     end
 end
 
@@ -165,7 +170,7 @@ else
     local TargetAddedConnection = Targetplr.CharacterAdded:Connect(OnTargetAdded)
     local ScriptConnection
     ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProcessed)
-        if input.KeyCode == Enum.KeyCode.SCRIPTOFFKEY and not gameProcessed then
+        if input.KeyCode == Enum.KeyCode[SCRIPTOFFKEY] and not gameProcessed then
             RestoreBodyPart(TargetCharacter, TPPART)
             print("Скрипт выключен")
             if TargetTpConnection then
