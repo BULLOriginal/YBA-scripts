@@ -112,15 +112,28 @@ end
 if not Targetplr then
     print("Игрок не найден")
 else
+    -- local JointsList = {}
     TargetCharacter = Targetplr.Character
-    local CutBodyPart = function (target, partName)
-        local head
+    local RestoreBodyPart = function (target, partName)
+        local part
         if target and target:FindFirstChild(partName) then
-            head = target:FindFirstChild(partName)
-            for _, v in pairs(head:GetChildren()) do
-                if v:IsA("Attachment") or v:IsA("Motor6D") then
+            part = target:FindFirstChild(partName)
+            for _, v in pairs(part:GetChildren()) do
+                if v:IsA("Motor6D") then
+                    v.Enabled = true
+                    print("Восстановлено соединение",v.Name,"у игрока",target.Name)
+                end
+            end
+        end
+    end
+    local CutBodyPart = function (target, partName)
+        local part
+        if target and target:FindFirstChild(partName) then
+            part = target:FindFirstChild(partName)
+            for _, v in pairs(part:GetChildren()) do
+                if v:IsA("Motor6D") then
+                    v.Enabled = false
                     print("Уничтожено соединение",v.Name,"у игрока",target.Name)
-                    v:Destroy()
                 end
             end
         end
@@ -133,7 +146,7 @@ else
     end
     local OnTargetAdded = function (character)
         TargetCharacter = character
-        wait(1)
+        TargetCharacter:WaitForChild(TPPART,10) --- чтобы успела отрезаться
         CutBodyPart(TargetCharacter, TPPART)
     end
     local OnCharacterAdded = function (character)
@@ -152,7 +165,8 @@ else
     local TargetAddedConnection = Targetplr.CharacterAdded:Connect(OnTargetAdded)
     local ScriptConnection
     ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProcessed)
-        if input.KeyCode == Enum.KeyCode.L and not gameProcessed then
+        if input.KeyCode == Enum.KeyCode.SCRIPTOFFKEY and not gameProcessed then
+            RestoreBodyPart(TargetCharacter, TPPART)
             print("Скрипт выключен")
             if TargetTpConnection then
                 TargetTpConnection:Disconnect()
