@@ -949,7 +949,7 @@ local CreateMarker = function (character)
 
     local Connect
     Connect = RunService.Stepped:Connect(function ()
-        if not character:FindFirstChild("HumanoidRootPart") and not Markers[character.Name] or (plrCharacter.HumanoidRootPart.Position - marker.Position).Magnitude > MARKERRENDERDISTANCE then
+        if not character:FindFirstChild("HumanoidRootPart") or not Markers[character.Name] or plrCharacter and (plrCharacter.HumanoidRootPart.Position - marker.Position).Magnitude > MARKERRENDERDISTANCE then
             Connect:Disconnect()
             Connect = nil
             weld:Destroy()
