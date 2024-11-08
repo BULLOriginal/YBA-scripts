@@ -5,7 +5,7 @@
 -- IMPALEGLITCHFLAG = true
 -- FATPLAYERS = true
 -- THINFRIENDS = true
--- MARKERTOGGLE = false
+-- MARKERTOGGLE = true
 -- AIM = true
 -- ADDTORUNSPEED = 11
 -- MARKERRENDERDISTANCE = 200
@@ -13,39 +13,39 @@
 -- CHOOSESTANDPOSE = nil
 -- SpectatorKey = "J"
 
-if PETUHVIEW: boolean == nil then
+if type(PETUHVIEW) ~= "boolean" or PETUHVIEW == nil then
     PETUHVIEW = true
 end
-if IMPALEGLITCHFLAG: boolean == nil then
+if type(IMPALEGLITCHFLAG) ~= "boolean" or IMPALEGLITCHFLAG == nil then
     IMPALEGLITCHFLAG = true
 end
-if FATPLAYERS: boolean == nil then
+if type(FATPLAYERS) ~= "boolean" or FATPLAYERS == nil then
     FATPLAYERS = true
 end
-if THINFRIENDS: boolean == nil then
+if type(THINFRIENDS) ~= "boolean" or THINFRIENDS  == nil then
     THINFRIENDS = true
 end
-if MARKERTOGGLE: boolean == nil then
+if type(MARKERTOGGLE) ~= "boolean" or MARKERTOGGLE == nil then
     MARKERTOGGLE = true
 end
-if AIM: boolean == nil then
+if type(AIM) ~= "boolean" or AIM == nil then
     AIM = true
 end
 
-if ADDTORUNSPEED: number == nil then
+if type(ADDTORUNSPEED) ~= "number" or ADDTORUNSPEED == nil then
     ADDTORUNSPEED = 11
 end
-if MARKERRENDERDISTANCE: number == nil then
+if type(MARKERRENDERDISTANCE) ~= "number" or MARKERRENDERDISTANCE == nil then
     MARKERRENDERDISTANCE = 200
 end
 
-if CHOOSEPOSE: string == nil then
+if type(CHOOSEPOSE) ~= "string" or CHOOSEPOSE == nil then
     CHOOSEPOSE = "T-Pose"
 end
-if CHOOSESTANDPOSE: string == nil then
+if type(CHOOSESTANDPOSE) ~= "string" or CHOOSESTANDPOSE == nil then
     CHOOSESTANDPOSE = CHOOSEPOSE
 end
-if SpectatorKey: string == nil then
+if type(SpectatorKey) ~= "string" or SpectatorKey == nil then
     SpectatorKey = "J"
 end
 
