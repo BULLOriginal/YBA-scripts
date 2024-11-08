@@ -1,16 +1,16 @@
 --- free run script
 ---Добавить значение к СКОРОСТИ БЕГА (Меньше = меньше шанс кика)
-local ADDTORUNSPEED = ADDTORUNSPEED or               12
-local PETUHVIEW = PETUHVIEW or                       true
-local IMPALEGLITCHFLAG = IMPALEGLITCHFLAG or         true
-local MARKERRENDERDISTANCE = MARKERRENDERDISTANCE or 200 --- 0 для отключения
-local AIM = AIM or                                   true
-local CHOOSEPOSE = CHOOSEPOSE or                    "T-Pose"
-local CHOOSESTANDPOSE = CHOOSESTANDPOSE or           nil
-local SpectatorKey = SpectatorKey or                 "J"
-local FATPLAYERS = FATPLAYERS or                     true
-local THINFRIENDS = THINFRIENDS or                   true
-local MARKERTOGGLE = MARKERTOGGLE or                 true
+local ADDTORUNSPEED = ADDTORUNSPEED: number or               12
+local PETUHVIEW = PETUHVIEW: boolean  or                       true
+local IMPALEGLITCHFLAG = IMPALEGLITCHFLAG: boolean or         true
+local MARKERRENDERDISTANCE = MARKERRENDERDISTANCE: number or 200 --- 0 для отключения
+local AIM = AIM: boolean or                                   true
+local CHOOSEPOSE = CHOOSEPOSE: string or                    "T-Pose"
+local CHOOSESTANDPOSE = CHOOSESTANDPOSE: string or           nil
+local SpectatorKey = SpectatorKey: string or                 "J"
+local FATPLAYERS = FATPLAYERS: boolean or                     true
+local THINFRIENDS = THINFRIENDS: boolean or                   true
+local MARKERTOGGLE = MARKERTOGGLE: boolean or                 true
 if not getgenv().IsValeraScriptRunning then
 getgenv().IsValeraScriptRunning = true
 
