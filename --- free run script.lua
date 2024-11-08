@@ -949,7 +949,7 @@ local CreateMarker = function (character)
 
     local Connect
     Connect = RunService.Stepped:Connect(function ()
-        if not character:FindFirstChild("HumanoidRootPart") or not Markers[character.Name] or plrCharacter and (plrCharacter.HumanoidRootPart.Position - marker.Position).Magnitude > MARKERRENDERDISTANCE then
+        if not character:FindFirstChild("HumanoidRootPart") or not plrCharacter or not Markers[character.Name] or (plrCharacter.HumanoidRootPart.Position - marker.Position).Magnitude > MARKERRENDERDISTANCE then
             Connect:Disconnect()
             Connect = nil
             weld:Destroy()
@@ -969,7 +969,7 @@ local CreateMarkers = function()
 	for _, plyr in ipairs(living:GetChildren()) do
         local humanoidRootPart
         if plyr then humanoidRootPart = plyr:FindFirstChild("HumanoidRootPart") end
-        if humanoidRootPart then
+        if humanoidRootPart and plrCharacter then
             local playerPosition = humanoidRootPart.Position
             local distance = (playerPosition - plrCharacter.HumanoidRootPart.Position).Magnitude
             if plyr.Name ~= plr.Name and distance < MARKERRENDERDISTANCE and not Markers[plyr.Name] then
