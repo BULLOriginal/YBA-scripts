@@ -1211,6 +1211,7 @@ local ReverceAdjustBody = function (child)
 end
 
 local AdjustBody = function (child)
+    wait(1)
     local player = Players:GetPlayerFromCharacter(child)
     if not player or player.Name == plr.Name then return end
 
