@@ -521,9 +521,11 @@ local ForceStand = function ()
         plrCharacter.StandMorph.HumanoidRootPart.StandAttach.AlignOrientation.MaxTorque = 100000
     end
 end
-
+local DoubleActivationSkills = {
+    "Crossfire Hurricane",
+}
 local IsOnCooldown = function (skill)
-    if plr.PlayerGui.HUD.Cooldowns.Frame:FindFirstChild(skill) then
+    if plr.PlayerGui.HUD.Cooldowns.Frame:FindFirstChild(skill) and not FindKeyByValue(DoubleActivationSkills, skill) then
         return true
     end
     return false
@@ -760,22 +762,12 @@ local NoSpamSkills = {
     -- "Hamon Breathing",
     -- "Spin Charge",
 }
-local DoubleActivationSkills = {
-    ["Crossfire Hurricane"] = 0
-}
 local HandleHotkey = function (actionName, inputState, InputObject)
     if inputState == Enum.UserInputState.Begin then
         print("InputObject.KeyCode"..tostring(InputObject.KeyCode))
         local skill = GetSkill(InputObject.KeyCode)
-        if DoubleActivationSkills[skill] then
-            if not IsOnCooldown(skill) then
-                DoubleActivationSkills[skill] = 0
-            else
-                DoubleActivationSkills[skill] = DoubleActivationSkills[skill] + 1
-            end
-        end
         while UserInputService:IsKeyDown(InputObject.KeyCode) and RunService.Stepped:Wait() do
-            if plrCharacter and skill and (not IsOnCooldown(skill) or DoubleActivationSkills[skill] ~= nil and DoubleActivationSkills[skill] < 2) then
+            if plrCharacter and skill and not IsOnCooldown(skill) then
                 if plrCharacter.Blocking_Capacity.Value ~= 0 then
                     StopBlocking()
                 end

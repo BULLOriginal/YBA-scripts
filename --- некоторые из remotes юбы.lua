@@ -287,7 +287,9 @@ game:GetService("Players").LocalPlayer.Character.RemoteFunction:InvokeServer(unp
 
 Players.LocalPlayer.Character.RemoteEvent:FireServer("SBR_Servers") --- открыть выбор серверов
 
-Players.LocalPlayer.Character.RemoteEvent:FireServer("SBR_Back") --- быстрый перезаход на тот же сервер
+local Players = game:GetService("Players")
+local plr = Players.LocalPlayer
+plr.Character.RemoteEvent:FireServer("SBR_Back") --- быстрый перезаход на тот же сервер
 
 
 local plr = game.Players.LocalPlayer
