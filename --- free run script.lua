@@ -972,9 +972,9 @@ local CreateMarker = function (character)
     local HumanoidRootPart = character.HumanoidRootPart
 
     marker.Shape = Enum.PartType.Cylinder
-    marker.Size = Vector3.new(5, 2, 2)
+    marker.Size = Vector3.new(7, 2, 2)
     marker.Rotation = Vector3.new(0, 0, 90)
-    marker.Color = Color3.fromRGB(255, 50, 50)
+    marker.Color = Color3.fromRGB(0, 200, 200)
     marker.Transparency = 0.7
     marker.Anchored = false
     marker.Massless = true
@@ -1193,7 +1193,7 @@ end
 local ReverceAdjustBody = function (child)
     local player = Players:GetPlayerFromCharacter(child)
     if not player or player.Name == plr.Name then return end
-
+    wait(2)
     local isFriend = IsMyFriend(player)
     if not isFriend then
         ScalePlayerBody(player, Vector3.new(THINFRIENDSSIZE, 1, THINFRIENDSSIZE))
@@ -1203,10 +1203,9 @@ local ReverceAdjustBody = function (child)
 end
 
 local AdjustBody = function (child)
-    wait(1)
     local player = Players:GetPlayerFromCharacter(child)
     if not player or player.Name == plr.Name then return end
-
+    wait(2)
     local isFriend = IsMyFriend(player)
     if isFriend then
         ScalePlayerBody(player, Vector3.new(THINFRIENDSSIZE, 1, THINFRIENDSSIZE))
@@ -1216,7 +1215,7 @@ local AdjustBody = function (child)
 end
 
 for _, v in pairs(living:GetChildren()) do
-    AdjustBody(v)
+    spawn(AdjustBody(v))
 end
 local AdjustBodyConnection
 AdjustBodyConnection = living.ChildAdded:Connect(AdjustBody)
@@ -1239,13 +1238,13 @@ ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProc
         print("Скрипт выключен")
         indicators:DeleteAll()
 
-        for _, v in pairs(living:GetChildren()) do
-            ReverceAdjustBody(v)
-        end
-
         if AdjustBodyConnection then
             AdjustBodyConnection:Disconnect()
             AdjustBodyConnection = nil
+        end
+
+        for _, v in pairs(living:GetChildren()) do
+            spawn(ReverceAdjustBody(v))
         end
 
         if BlockBreakListeningConnection then
