@@ -1194,6 +1194,7 @@ local IsMyFriend = function (Player)
 end
 
 local ReverceAdjustBody = function (child)
+    if not child then return end
     local player = Players:GetPlayerFromCharacter(child)
     if not player or player.Name == plr.Name then return end
     wait(2)
@@ -1206,6 +1207,7 @@ local ReverceAdjustBody = function (child)
 end
 
 local AdjustBody = function (child)
+    if not child then return end
     local player = Players:GetPlayerFromCharacter(child)
     if not player or player.Name == plr.Name then return end
     local isFriend = IsMyFriend(player)
@@ -1247,9 +1249,11 @@ ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProc
             AdjustBodyConnection = nil
         end
 
-        delay(2, function ()
-            ReverceAdjustBody(v)
-        end)
+        for _, v in pairs(living:GetChildren()) do
+            delay(2, function ()
+                ReverceAdjustBody(v)
+            end)
+        end
 
         if BlockBreakListeningConnection then
             BlockBreakListeningConnection:Disconnect()
