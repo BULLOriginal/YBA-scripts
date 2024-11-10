@@ -1156,9 +1156,9 @@ function ScalePlayerBody(player, bodyscale)
         if part:IsA("MeshPart") then
             local origSize = part.OriginalSize.Value
             part.Size = Vector3.new(
-                origSize.Size.X * scale.X,
-                origSize.Size.Y * scale.Y,
-                origSize.Size.Z * scale.Z
+                origSize.X * scale.X,
+                origSize.Y * scale.Y,
+                origSize.Z * scale.Z
             )
         end
     end
