@@ -9,6 +9,8 @@
 -- AIM = true
 -- ADDTORUNSPEED = 11
 -- MARKERRENDERDISTANCE = 200
+-- FATPLAYERSSIZE = 3
+-- THINFRIENDSSIZE = 0.3
 -- CHOOSEPOSE = "T-Pose"
 -- CHOOSESTANDPOSE = nil
 -- SpectatorKey = "J"
@@ -37,6 +39,12 @@ if type(ADDTORUNSPEED) ~= "number" or ADDTORUNSPEED == nil then
 end
 if type(MARKERRENDERDISTANCE) ~= "number" or MARKERRENDERDISTANCE == nil then
     MARKERRENDERDISTANCE = 200
+end
+if type(FATPLAYERSSIZE) ~= "number" or FATPLAYERSSIZE == nil then
+    FATPLAYERSSIZE = 3
+end
+if type(THINFRIENDSSIZE) ~= "number" or THINFRIENDSSIZE == nil then
+    THINFRIENDSSIZE = 0.3
 end
 
 if type(CHOOSEPOSE) ~= "string" or CHOOSEPOSE == nil then
@@ -253,14 +261,12 @@ local CreateAim = function ()
 end
 
 local AdjustHumanoidHpDistance = function ()
-    local humanoid = plrCharacter:WaitForChild("Humanoid", 10)
-    humanoid.HealthDisplayDistance = 100000
-    humanoid.NameDisplayDistance = 100000
+    plr.HealthDisplayDistance = math.huge
+    plr.NameDisplayDistance = math.huge
 end
 local ToNormalHumanoidHpDistance = function ()
-    local humanoid = plrCharacter:WaitForChild("Humanoid", 10)
-    humanoid.HealthDisplayDistance = 45
-    humanoid.NameDisplayDistance = 45
+    plr.HealthDisplayDistance = 45
+    plr.NameDisplayDistance = 45
 end
 
 
@@ -1148,6 +1154,66 @@ end
 local BlockBreakListeningConnection
 BlockBreakListeningConnection = RunService.Stepped:Connect(BlockBreakListening)
 
+function ScalePlayerBody(player, bodyscale)
+    local character = player.Character
+    if not character then
+        warn("Персонаж для разжирения не найден.")
+        return
+    end
+    local scalePart = function (part, scale)
+        if part:IsA("MeshPart") then
+            part.Size = Vector3.new(
+                part.Size.X * scale.X,
+                part.Size.Y * scale.Y,
+                part.Size.Z * scale.Z
+            )
+        end
+    end
+    for _, part in ipairs(character:GetDescendants()) do
+        scalePart(part, bodyscale)
+    end
+    for _, motor in ipairs(character:GetDescendants()) do
+        if motor:IsA("Motor6D") then
+            local part0 = motor.Part0
+            local part1 = motor.Part1
+
+            if part0 and part1 then
+                motor.C0 = CFrame.new(
+                    motor.C0.X * bodyscale.X,
+                    motor.C0.Y * bodyscale.Y,
+                    motor.C0.Z * bodyscale.Z
+                ) * motor.C0.Rotation
+
+                motor.C1 = CFrame.new(
+                    motor.C1.X * bodyscale.X,
+                    motor.C1.Y * bodyscale.Y,
+                    motor.C1.Z * bodyscale.Z
+                ) * motor.C1.Rotation
+            end
+        end
+    end
+end
+
+local IsMyFriend = function (Player)
+    Player:IsFriendsWith(plr.UserId)
+end
+AdjustLowerTorso = function (child)
+    local player = Players:GetPlayerFromCharacter(child)
+    if not player then return end
+
+    local isFriend = IsMyFriend(player)
+    if isFriend then
+        ScalePlayerBody(player, Vector3.new(THINFRIENDSSIZE, 1, THINFRIENDSSIZE))
+    else
+        ScalePlayerBody(player, Vector3.new(FATPLAYERSSIZE, 1, FATPLAYERSSIZE))
+    end
+end
+
+for _, v in pairs(living:GetChildren()) do
+    AdjustLowerTorso(v)
+end
+local AdjustLowerTorsoConnection
+AdjustLowerTorsoConnection = living.ChildAdded:Connect()
 
 -------
 
@@ -1166,6 +1232,11 @@ ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProc
         getgenv().IsValeraScriptRunning = false
         print("Скрипт выключен")
         indicators:DeleteAll()
+
+        if AdjustLowerTorsoConnection then
+            AdjustLowerTorsoConnection:Disconnect()
+            AdjustLowerTorsoConnection = nil
+        end
 
         if BlockBreakListeningConnection then
             BlockBreakListeningConnection:Disconnect()

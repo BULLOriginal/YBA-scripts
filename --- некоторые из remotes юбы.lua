@@ -285,3 +285,11 @@ local args = {
 
 game:GetService("Players").LocalPlayer.Character.RemoteFunction:InvokeServer(unpack(args))
 
+Players.LocalPlayer.Character.RemoteEvent:FireServer("SBR_Servers") --- открыть выбор серверов
+
+Players.LocalPlayer.Character.RemoteEvent:FireServer("SBR_Back") --- быстрый перезаход на тот же сервер
+
+
+local plr = game.Players.LocalPlayer
+local Remote = plr.Character.RemoteEvent
+Remote:FireServer("SigL") ---!!!! забанит акк, на котором запущено
