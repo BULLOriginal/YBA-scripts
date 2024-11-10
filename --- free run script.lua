@@ -1154,10 +1154,11 @@ function ScalePlayerBody(player, bodyscale)
     end
     local scalePart = function (part, scale)
         if part:IsA("MeshPart") then
+            local origSize = part.OriginalSize.Value
             part.Size = Vector3.new(
-                part.Size.X * scale.X,
-                part.Size.Y * scale.Y,
-                part.Size.Z * scale.Z
+                origSize.Size.X * scale.X,
+                origSize.Size.Y * scale.Y,
+                origSize.Size.Z * scale.Z
             )
         end
     end
@@ -1205,7 +1206,6 @@ end
 local AdjustBody = function (child)
     local player = Players:GetPlayerFromCharacter(child)
     if not player or player.Name == plr.Name then return end
-    wait(2)
     local isFriend = IsMyFriend(player)
     if isFriend then
         ScalePlayerBody(player, Vector3.new(THINFRIENDSSIZE, 1, THINFRIENDSSIZE))
@@ -1215,7 +1215,9 @@ local AdjustBody = function (child)
 end
 
 for _, v in pairs(living:GetChildren()) do
-    spawn(AdjustBody(v))
+    delay(2, function ()
+        AdjustBody(v)
+    end)
 end
 local AdjustBodyConnection
 AdjustBodyConnection = living.ChildAdded:Connect(AdjustBody)
@@ -1243,9 +1245,9 @@ ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProc
             AdjustBodyConnection = nil
         end
 
-        for _, v in pairs(living:GetChildren()) do
-            spawn(ReverceAdjustBody(v))
-        end
+        delay(2, function ()
+            ReverceAdjustBody(v)
+        end)
 
         if BlockBreakListeningConnection then
             BlockBreakListeningConnection:Disconnect()
