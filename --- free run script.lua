@@ -1195,7 +1195,7 @@ function ScalePlayerBody(player, bodyscale)
 end
 
 local IsMyFriend = function (Player)
-    Player:IsFriendsWith(plr.UserId)
+    return Player:IsFriendsWith(plr.UserId)
 end
 AdjustLowerTorso = function (child)
     local player = Players:GetPlayerFromCharacter(child)
