@@ -1195,10 +1195,10 @@ local ReverceAdjustBody = function (child)
     if not player or player.Name == plr.Name then return end
     wait(2)
     local isFriend = IsMyFriend(player)
-    if not isFriend then
-        ScalePlayerBody(player, Vector3.new(THINFRIENDSSIZE, 1, THINFRIENDSSIZE))
+    if isFriend then
+        ScalePlayerBody(player, Vector3.new(1/THINFRIENDSSIZE, 1, 1/THINFRIENDSSIZE))
     else
-        ScalePlayerBody(player, Vector3.new(FATPLAYERSSIZE, 1, FATPLAYERSSIZE))
+        ScalePlayerBody(player, Vector3.new(1/FATPLAYERSSIZE, 1, 1/FATPLAYERSSIZE))
     end
 end
 
