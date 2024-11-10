@@ -1197,9 +1197,22 @@ end
 local IsMyFriend = function (Player)
     return Player:IsFriendsWith(plr.UserId)
 end
-AdjustLowerTorso = function (child)
+
+local ReverceAdjustBody = function (child)
     local player = Players:GetPlayerFromCharacter(child)
-    if not player then return end
+    if not player or player.Name == plr.Name then return end
+
+    local isFriend = IsMyFriend(player)
+    if not isFriend then
+        ScalePlayerBody(player, Vector3.new(THINFRIENDSSIZE, 1, THINFRIENDSSIZE))
+    else
+        ScalePlayerBody(player, Vector3.new(FATPLAYERSSIZE, 1, FATPLAYERSSIZE))
+    end
+end
+
+local AdjustBody = function (child)
+    local player = Players:GetPlayerFromCharacter(child)
+    if not player or player.Name == plr.Name then return end
 
     local isFriend = IsMyFriend(player)
     if isFriend then
@@ -1210,10 +1223,10 @@ AdjustLowerTorso = function (child)
 end
 
 for _, v in pairs(living:GetChildren()) do
-    AdjustLowerTorso(v)
+    AdjustBody(v)
 end
-local AdjustLowerTorsoConnection
-AdjustLowerTorsoConnection = living.ChildAdded:Connect()
+local AdjustBodyConnection
+AdjustBodyConnection = living.ChildAdded:Connect(AdjustBody)
 
 -------
 
@@ -1233,9 +1246,13 @@ ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProc
         print("Скрипт выключен")
         indicators:DeleteAll()
 
-        if AdjustLowerTorsoConnection then
-            AdjustLowerTorsoConnection:Disconnect()
-            AdjustLowerTorsoConnection = nil
+        for _, v in pairs(living:GetChildren()) do
+            ReverceAdjustBody(v)
+        end
+
+        if AdjustBodyConnection then
+            AdjustBodyConnection:Disconnect()
+            AdjustBodyConnection = nil
         end
 
         if BlockBreakListeningConnection then
