@@ -1283,17 +1283,17 @@ local AdjustBody = function (child)
     end
 end
 
-for _, v in pairs(living:GetChildren()) do
-    v:WaitForChild("HumanoidRootPart",10):GetPropertyChangedSignal("Size"):Connect(function ()
-        AdjustBody(v)
-    end)
-end
-local AdjustBodyConnection
-AdjustBodyConnection = living.ChildAdded:Connect(function (child)
-    child:WaitForChild("HumanoidRootPart",10):GetPropertyChangedSignal("Size"):Connect(function ()
-        AdjustBody(child)
-    end)
-end)
+-- for _, v in pairs(living:GetChildren()) do
+--     v:WaitForChild("HumanoidRootPart",10):GetPropertyChangedSignal("Size"):Connect(function ()
+--         AdjustBody(v)
+--     end)
+-- end
+-- local AdjustBodyConnection
+-- AdjustBodyConnection = living.ChildAdded:Connect(function (child)
+--     child:WaitForChild("HumanoidRootPart",10):GetPropertyChangedSignal("Size"):Connect(function ()
+--         AdjustBody(child)
+--     end)
+-- end)
 
 -------
 
