@@ -3,14 +3,14 @@
 
 -- PETUHVIEW = true
 -- IMPALEGLITCHFLAG = true
--- FATPLAYERS = true
--- THINFRIENDS = true
 -- MARKERTOGGLE = true
 -- AIM = true
+-- BBINDICATOR = true
 -- ADDTORUNSPEED = 11
 -- MARKERRENDERDISTANCE = 200
 -- FATPLAYERSSIZE = 3
 -- THINFRIENDSSIZE = 0.3
+-- PARTFORSCALE = "LowerTorso"
 -- CHOOSEPOSE = "T-Pose"
 -- CHOOSESTANDPOSE = nil
 -- SpectatorKey = "J"
@@ -21,17 +21,14 @@ end
 if type(IMPALEGLITCHFLAG) ~= "boolean" or IMPALEGLITCHFLAG == nil then
     IMPALEGLITCHFLAG = true
 end
-if type(FATPLAYERS) ~= "boolean" or FATPLAYERS == nil then
-    FATPLAYERS = true
-end
-if type(THINFRIENDS) ~= "boolean" or THINFRIENDS  == nil then
-    THINFRIENDS = true
-end
 if type(MARKERTOGGLE) ~= "boolean" or MARKERTOGGLE == nil then
     MARKERTOGGLE = true
 end
 if type(AIM) ~= "boolean" or AIM == nil then
     AIM = true
+end
+if type(BBINDICATOR) ~= "boolean" or BBINDICATOR == nil then
+    BBINDICATOR = true
 end
 
 if type(ADDTORUNSPEED) ~= "number" or ADDTORUNSPEED == nil then
@@ -40,13 +37,16 @@ end
 if type(MARKERRENDERDISTANCE) ~= "number" or MARKERRENDERDISTANCE == nil then
     MARKERRENDERDISTANCE = 200
 end
-if type(FATPLAYERSSIZE) ~= "number" or FATPLAYERSSIZE == nil then
-    FATPLAYERSSIZE = 3
+if type(FATPLAYERSSIZE) ~= "number" or FATPLAYERSSIZE == 0 or FATPLAYERSSIZE == nil then
+    FATPLAYERSSIZE = 2
 end
-if type(THINFRIENDSSIZE) ~= "number" or THINFRIENDSSIZE == nil then
+if type(THINFRIENDSSIZE) ~= "number" or THINFRIENDS == 0 or THINFRIENDSSIZE == nil then
     THINFRIENDSSIZE = 0.3
 end
 
+if type(PARTFORSCALE) ~= "string" or PARTFORSCALE == nil then
+    PARTFORSCALE = "LowerTorso"
+end
 if type(CHOOSEPOSE) ~= "string" or CHOOSEPOSE == nil then
     CHOOSEPOSE = "T-Pose"
 end
@@ -70,6 +70,7 @@ local Stats = game:GetService("Stats")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local living = Workspace:WaitForChild("Living",10)
+local OneFrameWait = function () RunService.Stepped:Wait() end
 local animDir = ReplicatedStorage:WaitForChild("Anims",10)
 if not animDir then
     print("RESTART SCRIPT")
@@ -1053,18 +1054,22 @@ function Indicators:UpdateProgress(player)
     local indicator = self.indicators[player]
     if indicator then
         local elapsedTime = tick() - indicator.startTime
-        local greenTime = 3  -- Время для зеленой полоски
-        local redTime = 2    -- Время для красной полоски
+        local greenTime = 3
+        local redTime = 2
 
         -- Обновляем размер зеленой полоски, уменьшая её с обоих концов
-        local greenProgress = math.clamp((greenTime - elapsedTime) / greenTime, 0, 1)
-        indicator.greenBar.Size = UDim2.new(greenProgress, 0, 0.3, 0)
-        indicator.greenBar.Position = UDim2.new(0.5, 0, 0.5, 0)
+        if indicator.greenBar then
+            local greenProgress = math.clamp((greenTime - elapsedTime) / greenTime, 0, 1)
+            indicator.greenBar.Size = UDim2.new(greenProgress, 0, 0.3, 0)
+            indicator.greenBar.Position = UDim2.new(0.5, 0, 0.5, 0)
+        end
 
         -- Обновляем размер красной полоски, уменьшая её с обоих концов
-        local redProgress = math.clamp((redTime - elapsedTime) / redTime, 0, 1)
-        indicator.redBar.Size = UDim2.new(redProgress * 0.66, 0, 0.3, 0) -- Уменьшаем до 66% ширины
-        indicator.redBar.Position = UDim2.new(0.5, 0, 0.5, 0)
+        if indicator.redBar then
+            local redProgress = math.clamp((redTime - elapsedTime) / redTime, 0, 1)
+            indicator.redBar.Size = UDim2.new(redProgress * 0.66, 0, 0.3, 0) -- Уменьшаем до 66% ширины
+            indicator.redBar.Position = UDim2.new(0.5, 0, 0.5, 0)
+        end
 
         -- Удаление индикатора, когда время истекло
         if elapsedTime >= greenTime or not player then
@@ -1075,7 +1080,7 @@ end
 
 
 -- Создание индикатора для игрока
-function Indicators:Create(player)
+function Indicators:Create(player, type)
     if self.indicators[player] then
         warn("Indicator for this player already exists!")
         return
@@ -1088,18 +1093,24 @@ function Indicators:Create(player)
     billboardGui.AlwaysOnTop = true
     
     -- Зеленая полоска для 3 секунд, укорачивается с обоих концов
-    local greenBar = Instance.new("Frame", billboardGui)
-    greenBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)  -- Зеленый цвет
-    greenBar.AnchorPoint = Vector2.new(0.5, 0.5)
-    greenBar.Position = UDim2.new(0.5, 0, 0.5, 0)         -- Центрируем полоску
-    greenBar.BorderSizePixel = 0
+    local greenBar
+    if type ~= "pb" then
+        greenBar = Instance.new("Frame", billboardGui)
+        greenBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)  -- Зеленый цвет
+        greenBar.AnchorPoint = Vector2.new(0.5, 0.5)
+        greenBar.Position = UDim2.new(0.5, 0, 0.5, 0)         -- Центрируем полоску
+        greenBar.BorderSizePixel = 0
+    end
 
-    -- Красная полоска для 1 секунды, укорачивается с обоих концов быстрее
-    local redBar = Instance.new("Frame", billboardGui)
-    redBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)    -- Красный цвет
-    redBar.AnchorPoint = Vector2.new(0.5, 0.5)
-    redBar.Position = UDim2.new(0.5, 0, 0.5, 0)           -- Центрируем полоску
-    redBar.BorderSizePixel = 0
+    -- Красная полоска для 2 секунд, укорачивается с обоих концов
+    local redBar
+    if type ~= "bypassb" then
+        redBar = Instance.new("Frame", billboardGui)
+        redBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)    -- Красный цвет
+        redBar.AnchorPoint = Vector2.new(0.5, 0.5)
+        redBar.Position = UDim2.new(0.5, 0, 0.5, 0)           -- Центрируем полоску
+        redBar.BorderSizePixel = 0
+    end
 
     -- Устанавливаем BillboardGui на игрока
     billboardGui.Parent = player:FindFirstChild("Head")
@@ -1107,8 +1118,7 @@ function Indicators:Create(player)
     -- Сохраняем индикатор в таблицу
     self.indicators[player] = {gui = billboardGui, greenBar = greenBar, redBar = redBar, startTime = tick()}
 
-    local Connection
-    Connection = RunService.Stepped:Connect(function ()
+    RunService.Stepped:Connect(function ()
         indicators:UpdateProgress(player)
     end)
 
@@ -1126,64 +1136,120 @@ local IsInStun = function (playerCharacter)
     if playerCharacter:GetAttribute("StunnedEffect") then return true end
     return false
 end
-local IsBlockBreak = function (playerCharacter)
-    if playerCharacter:FindFirstChild("UpperTorso") and
-    playerCharacter.UpperTorso:FindFirstChild("HitAttach") and
-    playerCharacter.UpperTorso.HitAttach:FindFirstChild("10") then
+local IsBlockBreak = function (attach)
+    if attach and attach:FindFirstChild("10") then
+        return true
+    end
+    return false
+end
+local IsPerfectBlock = function (attach)
+    if attach and attach:FindFirstChild("Spin") then
         return true
     end
     return false
 end
 
-local BlockBreakListening = function ()
-    for _, v in pairs(living:GetChildren()) do
-        local stunned = IsInStun(v)
-        if stunned and IsBlockBreak(v) then
-            indicators:Create(v)
+local BBindicatorAllowed = BBINDICATOR
+local BlockBreakListening = function (character)
+    if not character then return end
+    if not character or character.Blocking_Capacity.Value ~= 0 or not BBindicatorAllowed then return end
+    local attach = character:FindFirstChild("UpperTorso"):WaitForChild("HitAttach",0.017) -- !!!!!!!
+    local stunned = IsInStun(character)
+    if not stunned then return end
+    warn(character.Name,"stunned", stunned)
+    if attach then
+        local bb = IsBlockBreak(attach)
+        if bb then
+            indicators:Create(character, "bb")
+            return
         end
+    else
+        warn(character.Name,"bypassed block", stunned)
+        indicators:Create(character, "bypassb")
+    end
+end
+local PerfectBlockListening = function (character)
+    if not character or not BBindicatorAllowed then return end
+    local stunned = IsInStun(character)
+    if not stunned then return end
+    local attach = character:FindFirstChild("UpperTorso"):WaitForChild("HitAttach",0.017)
+    local pb = IsPerfectBlock(attach)
+    if stunned and pb then
+        indicators:Create(character, "pb")
+        return
+    end
+end
+
+
+if BBindicatorAllowed then
+    for _, v in pairs(living:GetChildren()) do
+        spawn(function ()
+            local bc = v:WaitForChild("Blocking_Capacity",60)
+            if bc then
+                bc:GetPropertyChangedSignal("Value"):Connect(function ()
+                    BlockBreakListening(v)
+                end)
+            end
+            v:GetAttributeChangedSignal("StunnedEffect"):Connect(function ()
+                PerfectBlockListening(v)
+            end)
+        end)
     end
 end
 local BlockBreakListeningConnection
-BlockBreakListeningConnection = RunService.Stepped:Connect(BlockBreakListening)
+if BBindicatorAllowed then
+    BlockBreakListeningConnection = living.ChildAdded:Connect(function (child)
+        local bc = child:WaitForChild("Blocking_Capacity",60)
+        if bc then
+            bc:GetPropertyChangedSignal("Value"):Connect( function ()
+                BlockBreakListening(child)
+            end)
+        end
+        child:GetAttributeChangedSignal("StunnedEffect"):Connect(function ()
+            PerfectBlockListening(child)
+        end)
+    end)
+end
 
-function ScalePlayerBody(player, bodyscale)
+function ScalePlayerBody(player, targetscale, partForScale)
     local character = player.Character
-    if not character then
-        warn("Персонаж для разжирения не найден.")
-        return
+    if not character then return end
+    local CurrentScale = function ()
+        local torso = character:WaitForChild("LowerTorso",5)
+        local torsoOriginalSize = torso.OriginalSize.Value
+        return torso.Size / torsoOriginalSize
     end
+    local currentScale = CurrentScale()
     local scalePart = function (part, scale)
         if part:IsA("MeshPart") then
             local origSize = part:FindFirstChild("OriginalSize")
-            if origSize then origSize = origSize.Value end
-            if not origSize then origSize = part.Size end
+            local startValue
+            if origSize then startValue = origSize.Value else return end
             part.Size = Vector3.new(
-                origSize.X * scale.X,
-                origSize.Y * scale.Y,
-                origSize.Z * scale.Z
+                startValue.X * scale.X,
+                startValue.Y * scale.Y,
+                startValue.Z * scale.Z
             )
         end
     end
-    for _, part in ipairs(character:GetDescendants()) do
-        scalePart(part, bodyscale)
+    for _, part in ipairs(partForScale or character:GetDescendants()) do
+        scalePart(part, targetscale)
     end
-    for _, motor in ipairs(character:GetDescendants()) do
-        if motor:IsA("Motor6D") then
-            local part0 = motor.Part0
-            local part1 = motor.Part1
-
+    for _, weld in ipairs(partForScale or character:GetDescendants()) do
+        if weld:IsA("Motor6D") or weld:IsA("Weld") then
+            local part0 = weld.Part0
+            local part1 = weld.Part1
             if part0 and part1 then
-                motor.C0 = CFrame.new(
-                    motor.C0.X * bodyscale.X,
-                    motor.C0.Y * bodyscale.Y,
-                    motor.C0.Z * bodyscale.Z
-                ) * motor.C0.Rotation
-
-                motor.C1 = CFrame.new(
-                    motor.C1.X * bodyscale.X,
-                    motor.C1.Y * bodyscale.Y,
-                    motor.C1.Z * bodyscale.Z
-                ) * motor.C1.Rotation
+                weld.C0 = CFrame.new(
+                    weld.C0.X / currentScale.X * targetscale.X,
+                    weld.C0.Y / currentScale.Y * targetscale.Y,
+                    weld.C0.Z / currentScale.Z * targetscale.Z
+                ) * weld.C0.Rotation
+                weld.C1 = CFrame.new(
+                    weld.C1.X / currentScale.X * targetscale.X,
+                    weld.C1.Y / currentScale.Y * targetscale.Y,
+                    weld.C1.Z / currentScale.Z * targetscale.Z
+                ) * weld.C1.Rotation
             end
         end
     end
@@ -1197,12 +1263,11 @@ local ReverceAdjustBody = function (child)
     if not child then return end
     local player = Players:GetPlayerFromCharacter(child)
     if not player or player.Name == plr.Name then return end
-    wait(2)
     local isFriend = IsMyFriend(player)
     if isFriend then
-        ScalePlayerBody(player, Vector3.new(1/THINFRIENDSSIZE, 1, 1/THINFRIENDSSIZE))
+        ScalePlayerBody(player, Vector3.one, _)
     else
-        ScalePlayerBody(player, Vector3.new(1/FATPLAYERSSIZE, 1, 1/FATPLAYERSSIZE))
+        ScalePlayerBody(player, Vector3.one, child:FindFirstChild(PARTFORSCALE))
     end
 end
 
@@ -1212,19 +1277,23 @@ local AdjustBody = function (child)
     if not player or player.Name == plr.Name then return end
     local isFriend = IsMyFriend(player)
     if isFriend then
-        ScalePlayerBody(player, Vector3.new(THINFRIENDSSIZE, 1, THINFRIENDSSIZE))
+        ScalePlayerBody(player, Vector3.new(THINFRIENDSSIZE, 1, THINFRIENDSSIZE), _)
     else
-        ScalePlayerBody(player, Vector3.new(FATPLAYERSSIZE, 1, FATPLAYERSSIZE))
+        ScalePlayerBody(player, Vector3.new(FATPLAYERSSIZE, 1, FATPLAYERSSIZE), child:FindFirstChild(PARTFORSCALE))
     end
 end
 
 for _, v in pairs(living:GetChildren()) do
-    delay(2, function ()
+    v:WaitForChild("HumanoidRootPart",10):GetPropertyChangedSignal("Size"):Connect(function ()
         AdjustBody(v)
     end)
 end
 local AdjustBodyConnection
-AdjustBodyConnection = living.ChildAdded:Connect(AdjustBody)
+AdjustBodyConnection = living.ChildAdded:Connect(function (child)
+    child:WaitForChild("HumanoidRootPart",10):GetPropertyChangedSignal("Size"):Connect(function ()
+        AdjustBody(child)
+    end)
+end)
 
 -------
 
@@ -1243,6 +1312,8 @@ ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProc
         getgenv().IsValeraScriptRunning = false
         print("Скрипт выключен")
         indicators:DeleteAll()
+
+        BBindicatorAllowed = false
 
         if AdjustBodyConnection then
             AdjustBodyConnection:Disconnect()
