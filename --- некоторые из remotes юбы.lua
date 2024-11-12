@@ -292,6 +292,10 @@ local plr = Players.LocalPlayer
 plr.Character.RemoteEvent:FireServer("SBR_Back") --- быстрый перезаход на тот же сервер
 
 
+
+-- FireServer("SigL") ---!!!! забанит акк, на котором запущено
+
+
 local plr = game.Players.LocalPlayer
 local Remote = plr.Character.RemoteEvent
-Remote:FireServer("SigL") ---!!!! забанит акк, на котором запущено
+plr.RemoteEvent:FireServer("ReturnToLobby")

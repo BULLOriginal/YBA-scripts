@@ -6,6 +6,7 @@
 -- MARKERTOGGLE = true
 -- AIM = true
 -- BBINDICATOR = true
+-- STANDSKILLSPRIORITY = false
 -- ADDTORUNSPEED = 11
 -- MARKERRENDERDISTANCE = 200
 -- FATPLAYERSSIZE = 3
@@ -29,6 +30,9 @@ if type(AIM) ~= "boolean" or AIM == nil then
 end
 if type(BBINDICATOR) ~= "boolean" or BBINDICATOR == nil then
     BBINDICATOR = true
+end
+if type(STANDSKILLSPRIORITY) ~= "boolean" or STANDSKILLSPRIORITY == nil then
+    STANDSKILLSPRIORITY = true
 end
 
 if type(ADDTORUNSPEED) ~= "number" or ADDTORUNSPEED == nil then
@@ -463,12 +467,18 @@ local GetSkill = function (keycode)
     keycode = tostring(keycode)
     print(keycode)
     local skill
-    if UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) and TrueStandKeyBinds[keycode] then
-        skill = TrueStandKeyBinds[keycode]
-    elseif TrueSpecKeyBinds[keycode] then
-        skill = TrueSpecKeyBinds[keycode]
-    elseif TrueStandKeyBinds[keycode] then
-        skill = TrueStandKeyBinds[keycode]
+    local firstPrioritySkills, secondPrioritySkills =
+    TrueSpecKeyBinds, TrueStandKeyBinds
+    if STANDSKILLSPRIORITY then
+        firstPrioritySkills, secondPrioritySkills =
+        secondPrioritySkills, firstPrioritySkills
+    end
+    if UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) and secondPrioritySkills[keycode] then
+        skill = secondPrioritySkills[keycode]
+    elseif firstPrioritySkills[keycode] then
+        skill = firstPrioritySkills[keycode]
+    elseif secondPrioritySkills[keycode] then
+        skill = secondPrioritySkills[keycode]
     elseif keycode == "Enum.KeyCode."..plr:WaitForChild("PlayerStats").DashKey.Value then
         print("D")
         skill = "Dash"
@@ -1153,7 +1163,7 @@ local BBindicatorAllowed = BBINDICATOR
 local BlockBreakListening = function (character)
     if not character then return end
     if not character or character.Blocking_Capacity.Value ~= 0 or not BBindicatorAllowed then return end
-    local attach = character:FindFirstChild("UpperTorso"):WaitForChild("HitAttach",0.017) -- !!!!!!!
+    local attach = character:FindFirstChild("UpperTorso"):WaitForChild("HitAttach",0.03) -- !!!!!!!
     local stunned = IsInStun(character)
     if not stunned then return end
     warn(character.Name,"stunned", stunned)
@@ -1172,7 +1182,7 @@ local PerfectBlockListening = function (character)
     if not character or not BBindicatorAllowed then return end
     local stunned = IsInStun(character)
     if not stunned then return end
-    local attach = character:FindFirstChild("UpperTorso"):WaitForChild("HitAttach",0.017)
+    local attach = character:FindFirstChild("UpperTorso"):WaitForChild("HitAttach",0.03)
     local pb = IsPerfectBlock(attach)
     if stunned and pb then
         indicators:Create(character, "pb")
