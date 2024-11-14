@@ -804,8 +804,9 @@ local HandleHotkey = function (actionName, inputState, InputObject)
                     print("StopPOSING")
                     UseSkill(_,"StopPosing")
                 end
-                if UserInputService:IsKeyDown(Enum.KeyCode.M) and not IsOnCooldown("Epitaph")  then
+                if UserInputService:IsKeyDown(Enum.KeyCode.M) and not IsOnCooldown("Epitaph") and not IsOnCooldown("Your Own Shadow")  then
                     UseSkill("Epitaph")
+                    UseSkill("Your Own Shadow")
                     UseSkill(skill)
                 else
                     UseSkill(skill)
