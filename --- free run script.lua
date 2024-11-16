@@ -7,14 +7,29 @@
 -- AIM = true
 -- BBINDICATOR = true
 -- STANDSKILLSPRIORITY = false
+-- CUSTOMPOSE = false
 -- ADDTORUNSPEED = 11
 -- MARKERRENDERDISTANCE = 200
 -- FATPLAYERSSIZE = 3
 -- THINFRIENDSSIZE = 0.3
 -- PARTFORSCALE = "LowerTorso"
--- CHOOSEPOSE = "T-Pose"
+-- CHOOSECUSTOMPOSE = "T-Pose"
 -- CHOOSESTANDPOSE = nil
--- SpectatorKey = "J"
+-- SPECTATORKEY = "J"
+-- FINDSTANDSANDSPECS = true
+-- FINDSTANDS = {
+--     ["Star platinum"] = true,
+-- }
+-- FINDSPECS = {
+--     ["Boxing"] = true,
+--     ["Hamon (Caesar Zeppeli)"] = true,
+--     ["Hamon (Jonathan Joestar)"] = true,
+--     ["Hamon (Joseph Joestar)"] = true,
+--     ["Hamon (William Zeppeli)"] = true,
+--     ["Spin"] = true,
+--     ["SwordStyle"] = true,
+--     ["Vampirism"] = true,
+-- }
 
 if type(PETUHVIEW) ~= "boolean" or PETUHVIEW == nil then
     PETUHVIEW = true
@@ -32,7 +47,13 @@ if type(BBINDICATOR) ~= "boolean" or BBINDICATOR == nil then
     BBINDICATOR = true
 end
 if type(STANDSKILLSPRIORITY) ~= "boolean" or STANDSKILLSPRIORITY == nil then
-    STANDSKILLSPRIORITY = true
+    STANDSKILLSPRIORITY = false
+end
+if type(CUSTOMPOSE) ~= "boolean" or CUSTOMPOSE == nil then
+    CUSTOMPOSE = false
+end
+if type(FINDSTANDSANDSPECS) ~= "boolean" or FINDSTANDSANDSPECS == nil then
+    FINDSTANDSANDSPECS = true
 end
 
 if type(ADDTORUNSPEED) ~= "number" or ADDTORUNSPEED == nil then
@@ -44,22 +65,44 @@ end
 if type(FATPLAYERSSIZE) ~= "number" or FATPLAYERSSIZE == 0 or FATPLAYERSSIZE == nil then
     FATPLAYERSSIZE = 2
 end
-if type(THINFRIENDSSIZE) ~= "number" or THINFRIENDS == 0 or THINFRIENDSSIZE == nil then
+if type(THINFRIENDSSIZE) ~= "number" or THINFRIENDSSIZE == 0 or THINFRIENDSSIZE == nil then
     THINFRIENDSSIZE = 0.3
 end
 
 if type(PARTFORSCALE) ~= "string" or PARTFORSCALE == nil then
     PARTFORSCALE = "LowerTorso"
 end
-if type(CHOOSEPOSE) ~= "string" or CHOOSEPOSE == nil then
-    CHOOSEPOSE = "T-Pose"
+if type(CHOOSECUSTOMPOSE) ~= "string" or CHOOSECUSTOMPOSE == nil then
+    CHOOSECUSTOMPOSE = "T-Pose"
 end
 if type(CHOOSESTANDPOSE) ~= "string" or CHOOSESTANDPOSE == nil then
-    CHOOSESTANDPOSE = CHOOSEPOSE
+    CHOOSESTANDPOSE = CHOOSECUSTOMPOSE
 end
-if type(SpectatorKey) ~= "string" or SpectatorKey == nil then
-    SpectatorKey = "J"
+if type(SPECTATORKEY) ~= "string" or SPECTATORKEY == nil then
+    SPECTATORKEY = "J"
 end
+if type(FINDSTANDS) ~= "table" or FINDSTANDS == nil then
+    FINDSTANDS = {
+        ["Star platinum"] = true,
+        ["Hermit Purple"] = true,
+        ["Golden Experience"] = true,
+        ["Crazy Diamond"] = true,
+        ["Stone Free"] = true,
+    }
+end
+if type(FINDSPECS) ~= "table" or FINDSPECS == nil then
+    FINDSPECS = {
+        ["Boxing"] = false,
+        ["Hamon (Caesar Zeppeli)"] = true,
+        ["Hamon (Jonathan Joestar)"] = true,
+        ["Hamon (Joseph Joestar)"] = true,
+        ["Hamon (William Zeppeli)"] = true,
+        ["Spin"] = false,
+        ["SwordStyle"] = false,
+        ["Vampirism"] = false,}
+end
+
+
 
 
 if not getgenv().IsValeraScriptRunning then
@@ -74,22 +117,16 @@ local Stats = game:GetService("Stats")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local living = Workspace:WaitForChild("Living",10)
-local OneFrameWait = function () RunService.Stepped:Wait() end
-local animDir = ReplicatedStorage:WaitForChild("Anims",10)
-if not animDir then
-    print("RESTART SCRIPT")
-end
+local OneFrameWait = function() return RunService.Stepped:Wait() end
 local plr = Players.LocalPlayer
 local plrCharacter = plr.Character
 local IYMouse = plr:GetMouse()
 local camera = Workspace.CurrentCamera
+local PlayerGui = plr:WaitForChild("PlayerGui")
 
-local GetPingConnection
-local Ping = 0
 local GetPing = function()
-    Ping = Stats.PerformanceStats.Ping:GetValue()
+    return Stats.PerformanceStats.Ping:GetValue()
 end
-GetPingConnection = RunService.Stepped:Connect(GetPing)
 
 -- local BuffRunConnect
 local AlwaysSprintingConnect
@@ -139,7 +176,7 @@ end
 local spectatorFlag = false
 local SpectatorConnection
 SpectatorConnection = UserInputService.InputBegan:Connect(function (input, gameProcessed)
-    if input.KeyCode == Enum.KeyCode[SpectatorKey] and not gameProcessed then
+    if input.KeyCode == Enum.KeyCode[SPECTATORKEY] and not gameProcessed then
         if not spectatorFlag then
             TeleportCamera (GetClosestPlayerFromCursor().Character)
         else
@@ -189,7 +226,7 @@ local function updatePosition()
             increment = increment + 0.003
         end
         increment = -increment
-    elseif IsRunning() and plrCharacter.Humanoid.MoveDirection.Magnitude > 0 and plrCharacter.Blocking_Capacity.Value == 0 then
+    elseif IsRunning() and plrCharacter.Humanoid.MoveDirection.Magnitude > 0 and plrCharacter.Blocking_Capacity.Value == 0 and plrCharacter.Humanoid.WalkSpeed > 0 then
         if not isClimbing then
             plrCharacter.HumanoidRootPart.CFrame = plrCharacter.HumanoidRootPart.CFrame + plrCharacter.Humanoid.MoveDirection * (24 / 136) * ADDTORUNSPEED/10
         elseif UserInputService:IsKeyDown(Enum.KeyCode.W) then
@@ -208,19 +245,19 @@ end
 local FightKick = function()
     plrCharacter:WaitForChild("HumanoidRootPart")
     FightKickFlag = true
-    plr.DevEnableMouseLock = false
+    -- plr.DevEnableMouseLock = false
     UserInputService.MouseBehavior = Enum.MouseBehavior.Default
     -- local function blockInput(actionName, inputState, inputObject)
     --     return Enum.ContextActionResult.Sink -- Игнорируем весь ввод
     -- end
     -- ContextActionService:BindAction("BlockInput", blockInput, false, unpack(Enum.UserInputType:GetEnumItems()))
     while increment < 0.25 do
-        RunService.Stepped:wait() 
+        OneFrameWait()
         -- print(increment)
     end
     FightKickFlag = false
     wait(0.5)
-    plr.DevEnableMouseLock = true
+    -- plr.DevEnableMouseLock = true
     -- ContextActionService:UnbindAction("BlockInput")
     increment = 0.1
 end
@@ -343,7 +380,7 @@ StandOnConnection = UserInputService.InputBegan:Connect(function(input, gameProc
             if (not IsStand.Value or IsStand.Value and soundFound) then
                 print("Enabling stand...")
                 while(plrCharacter.SummonedStand and IsStand.Value) do wait(0.1); print("waiting cd...") end
-                while plrCharacter and not IsStand.Value do RunService.Stepped:Wait(); ToggleStand("On") end
+                while plrCharacter and not IsStand.Value do OneFrameWait(); ToggleStand("On") end
             end
         end
     end
@@ -361,94 +398,94 @@ local BarrierConnection = game.Workspace.ChildAdded:Connect(function(descendant)
 end)
 
 ------ TS notificator
-local IsAnimation = function (player, animationID)
-    if not player or not player:FindFirstChild("StandMorph") then
-        return false
-    end
-    local standMorph = player:FindFirstChild("StandMorph")
-    local humanoid = standMorph:FindFirstChild("AnimationController")
-    if humanoid then
-        local animator = humanoid:WaitForChild("Animator",3)
-        for _, track in pairs(animator:GetPlayingAnimationTracks()) do
-            if track.Animation.AnimationId  == animationID then
-                return true
-            end
-        end
-    end
-    return false
-end
-local bannedStands = {
-    ["Gold Experience Requiem"] = true,
-    ["D4C Love Train"] = true,
-    ["C-Moon"] = true,
-    ["Hierophant Green"] = true,
-    ["Chariot Requiem"] = true,
-}
-local FindTsing = function(position)
-	for _, plyr in ipairs(living:GetChildren()) do
-        if plyr and plyr:FindFirstChild("HumanoidRootPart") then
-            local playerPosition = plyr.HumanoidRootPart.Position
-            local distance = (playerPosition - position).Magnitude
-            if distance < 200 then
-                local standMorph = plyr:FindFirstChild("StandMorph")
-                if standMorph and standMorph:FindFirstChild("Stand Name") then
-                    if not bannedStands[standMorph:FindFirstChild("Stand Name").Value]  then
-                        -- print(plyr.Name.." dist = "..distance.." TS = ", IsAnimation(plyr, "rbxassetid://4139325504")) -- Печать расстояния для каждого игрока
-                        if IsAnimation(plyr, "rbxassetid://4139325504") then --ts id
-                            return plyr
-                        end
-                    end
-                end
-            end
-        end
-    end
-    return nil
-end
+-- local IsAnimation = function (player, animationID)
+--     if not player or not player:FindFirstChild("StandMorph") then
+--         return false
+--     end
+--     local standMorph = player:FindFirstChild("StandMorph")
+--     local humanoid = standMorph:FindFirstChild("AnimationController")
+--     if humanoid then
+--         local animator = humanoid:WaitForChild("Animator",3)
+--         for _, track in pairs(animator:GetPlayingAnimationTracks()) do
+--             if track.Animation.AnimationId  == animationID then
+--                 return true
+--             end
+--         end
+--     end
+--     return false
+-- end
+-- local bannedStands = {
+--     ["Gold Experience Requiem"] = true,
+--     ["D4C Love Train"] = true,
+--     ["C-Moon"] = true,
+--     ["Hierophant Green"] = true,
+--     ["Chariot Requiem"] = true,
+-- }
+-- local FindTsing = function(position)
+-- 	for _, plyr in ipairs(living:GetChildren()) do
+--         if plyr and plyr:FindFirstChild("HumanoidRootPart") then
+--             local playerPosition = plyr.HumanoidRootPart.Position
+--             local distance = (playerPosition - position).Magnitude
+--             if distance < 200 then
+--                 local standMorph = plyr:FindFirstChild("StandMorph")
+--                 if standMorph and standMorph:FindFirstChild("Stand Name") then
+--                     if not bannedStands[standMorph:FindFirstChild("Stand Name").Value]  then
+--                         -- print(plyr.Name.." dist = "..distance.." TS = ", IsAnimation(plyr, "rbxassetid://4139325504")) -- Печать расстояния для каждого игрока
+--                         if IsAnimation(plyr, "rbxassetid://4139325504") then --ts id
+--                             return plyr
+--                         end
+--                     end
+--                 end
+--             end
+--         end
+--     end
+--     return nil
+-- end
 
-local TsGui
-local CreateFrame = function (foundName)
-    if TsGui then
-        return
-    end
-    -- Получаем игрока и его экран (TsGui)
-    local playerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
-    -- Создаем ScreenTsGui
-    TsGui = Instance.new("ScreenGui")
-    TsGui.Parent = playerGui
+-- local TsGui
+-- local CreateFrame = function (foundName)
+--     if TsGui then
+--         return
+--     end
+--     -- Получаем игрока и его экран (TsGui)
+--     local playerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
+--     -- Создаем ScreenTsGui
+--     TsGui = Instance.new("ScreenGui")
+--     TsGui.Parent = playerGui
 
-    -- Создаем Frame
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0.3, 0, 0.1, 0) -- Размер 30% ширины и 10% высоты экрана
-    frame.Position = UDim2.new(0.35, 0, 0, 0) -- Позиция сверху по центру
-    frame.BackgroundColor3 = Color3.fromRGB(100, 0, 0) -- Цвет фона
-    frame.Parent = TsGui
-    -- Создаем текстовое поле с предложением
-    local textLabel = Instance.new("TextLabel")
-    textLabel.Size = UDim2.new(1, 0, 1, 0) -- Полный размер внутри фрейма
-    textLabel.Position = UDim2.new(0, 0, 0, 0)
-    textLabel.Text = foundName
-    textLabel.TextColor3 = Color3.fromRGB(200, 200, 200) -- Цвет текста
-    textLabel.BackgroundTransparency = 1 -- Прозрачный фон для текста
-    textLabel.Font = Enum.Font.SourceSans
-    textLabel.TextScaled = true -- Масштаб текста по размеру фрейма
-    textLabel.Parent = frame
-    print("TsGUI создан")
-    delay(4, function()
-        while TsGui and RunService.Stepped:wait() do
-            TsGui:Destroy()
-            TsGui = nil
-        end
-    end)
-end
+--     -- Создаем Frame
+--     local frame = Instance.new("Frame")
+--     frame.Size = UDim2.new(0.3, 0, 0.1, 0) -- Размер 30% ширины и 10% высоты экрана
+--     frame.Position = UDim2.new(0.35, 0, 0, 0) -- Позиция сверху по центру
+--     frame.BackgroundColor3 = Color3.fromRGB(100, 0, 0) -- Цвет фона
+--     frame.Parent = TsGui
+--     -- Создаем текстовое поле с предложением
+--     local textLabel = Instance.new("TextLabel")
+--     textLabel.Size = UDim2.new(1, 0, 1, 0) -- Полный размер внутри фрейма
+--     textLabel.Position = UDim2.new(0, 0, 0, 0)
+--     textLabel.Text = foundName
+--     textLabel.TextColor3 = Color3.fromRGB(200, 200, 200) -- Цвет текста
+--     textLabel.BackgroundTransparency = 1 -- Прозрачный фон для текста
+--     textLabel.Font = Enum.Font.SourceSans
+--     textLabel.TextScaled = true -- Масштаб текста по размеру фрейма
+--     textLabel.Parent = frame
+--     print("TsGUI создан")
+--     delay(4, function()
+--         while TsGui and OneFrameWait() do
+--             TsGui:Destroy()
+--             TsGui = nil
+--         end
+--     end)
+-- end
 
-ClosestTsConnection = RunService.Stepped:Connect(function ()
-    if plrCharacter:FindFirstChild("HumanoidRootPart") then
-        local found = FindTsing(plrCharacter.HumanoidRootPart.Position)
-        if found then
-            CreateFrame(found.Name)
-        end
-    end
-end)
+-- ClosestTsConnection = RunService.Stepped:Connect(function ()
+--     if plrCharacter:FindFirstChild("HumanoidRootPart") then
+--         local found = FindTsing(plrCharacter.HumanoidRootPart.Position)
+--         if found then
+--             CreateFrame(found.Name)
+--         end
+--     end
+-- end)
 
 --- Макросы на спек
 local MacrosConnection
@@ -468,8 +505,9 @@ local GetSkill = function (keycode)
     print(keycode)
     local skill
     local firstPrioritySkills, secondPrioritySkills =
-    TrueSpecKeyBinds, TrueStandKeyBinds
-    if STANDSKILLSPRIORITY then
+    table.clone(TrueSpecKeyBinds), table.clone(TrueStandKeyBinds)
+    local IsStand = plrCharacter:FindFirstChild("SummonedStand")
+    if STANDSKILLSPRIORITY and IsStand and IsStand.Value then
         firstPrioritySkills, secondPrioritySkills =
         secondPrioritySkills, firstPrioritySkills
     end
@@ -486,6 +524,7 @@ local GetSkill = function (keycode)
         print("P")
         skill = "StartPosing"
     end
+    print(skill)
     return skill
 end
 local GetSpecItem = function ()
@@ -512,7 +551,7 @@ local ForceStand = function ()
     if plrCharacter and plrCharacter:FindFirstChild("StandMorph") then
         wait(0.34)   
         for i = 0, 2 do
-            RunService.Stepped:Wait()
+            OneFrameWait()
         end
         local part = Instance.new("BodyAngularVelocity", plrCharacter.StandMorph.HumanoidRootPart)
         local b = 999999999
@@ -521,14 +560,14 @@ local ForceStand = function ()
         plrCharacter.StandMorph.HumanoidRootPart.StandAttach.AlignOrientation.Responsiveness = 200
         part.AngularVelocity = Vector3.new(plrCharacter.HumanoidRootPart.CFrame.lookVector.Z, 0, -plrCharacter.HumanoidRootPart.CFrame.lookVector.X) * -b
         for i = 0, 2 do
-            RunService.Stepped:Wait()
+            OneFrameWait()
         end
         part.AngularVelocity = Vector3.new(0, 0, 0)
         part:Destroy()
         wait(0.5)
         plrCharacter.StandMorph.HumanoidRootPart.StandAttach.AlignOrientation.MaxTorque = "inf"
         plrCharacter.StandMorph.HumanoidRootPart.StandAttach.AlignOrientation.Responsiveness = 70
-        RunService.Stepped:Wait()
+        OneFrameWait()
         plrCharacter.StandMorph.HumanoidRootPart.StandAttach.AlignOrientation.MaxTorque = 100000
     end
 end
@@ -652,8 +691,8 @@ local UseSkill = function (skill, A_1)
     end
 
     if camtpflag then
-        for i = 0,6,1 do
-            RunService.Stepped:wait()
+        for i = 0,10,1 do
+            OneFrameWait()
         end
         RunService:UnbindFromRenderStep("TeleportCameraConnection")
         camera.CFrame = CameraSafe
@@ -747,37 +786,54 @@ if plrCharacter:FindFirstChild("SpecSkills") then
     end
 end
 
-local FoundPoses = {}
-local AddPoseToMemory = function (Pose)
-    if not FoundPoses[Pose.Name] then
-        FoundPoses[Pose.Name] = Pose
+-- local FoundPoses = {}
+-- local AddPoseToMemory = function (Pose)
+--     if not FoundPoses[Pose.Name] then
+--         FoundPoses[Pose.Name] = Pose
+--     end
+-- end
+-- local GetPoseByName = function (Name)
+--     local animDir = ReplicatedStorage:FindFirstChild("Anims")
+--     local foundAnim
+--     for _, v in pairs(animDir:GetDescendants()) do
+--         if v:IsA("Animation") and v.Name == Name then
+--             foundAnim = true
+--             AddPoseToMemory(v)
+--         end
+--     end
+--     if not foundAnim then
+--         warn(`No poses with provided name \"{CHOOSECUSTOMPOSE}\" found`)
+--         AddPoseToMemory(game:GetService("ReplicatedStorage").Anims.Poses["T-Pose"])
+--     end
+-- end
+local StartPosing = function ()
+    if CUSTOMPOSE then
+        UseSkill({  ["PlayerIdle"] = FoundPoses[CHOOSECUSTOMPOSE],
+                    ["StandIdle"] = FoundPoses[CHOOSESTANDPOSE]}, 
+        "StartPosing")
+    else
+        UseSkill(_,"StartPosing")
     end
 end
-local GetPoseByName = function (Name : string)
-    if not Name then
-        print("Pose name указан неверно")
-        Name = "T-Pose"
-    end
-    for _, v in pairs(animDir:GetDescendants()) do
-        if v:IsA("Animation") and v.Name == Name then
-            AddPoseToMemory(v)
-        end
+
+local StopPosing = function ()
+    if plrCharacter.HumanoidRootPart:FindFirstChild("Menacing") then
+        print("StopPOSING")
+        UseSkill(_,"StopPosing")
     end
 end
-GetPoseByName(CHOOSEPOSE)
-GetPoseByName(CHOOSESTANDPOSE)
+-- GetPoseByName(CHOOSECUSTOMPOSE)
+-- GetPoseByName(CHOOSESTANDPOSE)
 
 local NoSpamSkills = {
     "Shell Form",
     "Turtle Form",
-    -- "Hamon Breathing",
-    -- "Spin Charge",
 }
 local HandleHotkey = function (actionName, inputState, InputObject)
     if inputState == Enum.UserInputState.Begin then
         print("InputObject.KeyCode"..tostring(InputObject.KeyCode))
         local skill = GetSkill(InputObject.KeyCode)
-        while UserInputService:IsKeyDown(InputObject.KeyCode) and RunService.Stepped:Wait() do
+        while UserInputService:IsKeyDown(InputObject.KeyCode) and OneFrameWait() do
             if plrCharacter and skill and not IsOnCooldown(skill) then
                 if plrCharacter.Blocking_Capacity.Value ~= 0 then
                     StopBlocking()
@@ -794,19 +850,12 @@ local HandleHotkey = function (actionName, inputState, InputObject)
                     end
                 end
                 if skill == "StartPosing" then
-                    print("Start Posing")
-                    UseSkill({  ["PlayerIdle"] = FoundPoses[CHOOSEPOSE],
-                                ["StandIdle"] = FoundPoses[CHOOSESTANDPOSE]}, 
-                    skill)
+                    StartPosing()
                     break
                 end
-                if plrCharacter.HumanoidRootPart:FindFirstChild("Menacing") then
-                    print("StopPOSING")
-                    UseSkill(_,"StopPosing")
-                end
-                if UserInputService:IsKeyDown(Enum.KeyCode.M) and not IsOnCooldown("Epitaph") and not IsOnCooldown("Your Own Shadow")  then
+                StopPosing()
+                if UserInputService:IsKeyDown(Enum.KeyCode.M) and not IsOnCooldown("Epitaph")  then
                     UseSkill("Epitaph")
-                    UseSkill("Your Own Shadow")
                     UseSkill(skill)
                 else
                     UseSkill(skill)
@@ -814,14 +863,10 @@ local HandleHotkey = function (actionName, inputState, InputObject)
                 if FindKeyByValue(NoSpamSkills, skill) then
                     break
                 end
-                -- wait(0.6)
-                -- if standMorph and standMorph:FindFirstChild("HumanoidRootPart") then
-                --     plrCharacter.StandMorph.HumanoidRootPart.StandAttach.AlignPosition.Responsiveness = 70
-                -- end
             end
-            if skill == "Hamon Breathing" or skill == "Spin Charge" then
+            if skill == "Hamon Breathing" or skill == "Spin Charge" then --- добавить глайд ВА
                 while UserInputService:IsKeyDown(InputObject.KeyCode) do
-                    RunService.Stepped:wait()
+                    OneFrameWait()
                 end
                 break
             end
@@ -964,270 +1009,13 @@ end
 if PETUHVIEW then
     ignInstConnect = ignoreinstances.ChildAdded:Connect(OnCrossfireAdded)
 end
------------mark direction
-local Markers = {}
-local DeleteMarker = function (Name)
-    if Markers[Name] then
-        Markers[Name]:Destroy()
-        Markers[Name] = nil
-        -- print("маркер игрока",Name,"удалён")
-    end
-end
-local CreateMarker = function (character)
-    local marker = Instance.new("Part")
-    if Markers[character.Name] then
-        -- print("маркер игрока",character.Name,"уже существует")
-        return
-    end
-    Markers[character.Name] = marker
-    -- print("маркер игрока",character.Name,"добавлен")
-    local HumanoidRootPart = character.HumanoidRootPart
-
-    marker.Shape = Enum.PartType.Cylinder
-    marker.Size = Vector3.new(7, 2, 2)
-    marker.Rotation = Vector3.new(0, 0, 90)
-    marker.Color = Color3.fromRGB(0, 200, 200)
-    marker.Transparency = 0.7
-    marker.Anchored = false
-    marker.Massless = true
-    marker.CanCollide = false
-    marker.Parent = HumanoidRootPart
-
-    local weld = Instance.new("Weld")
-    weld.Parent = HumanoidRootPart
-    weld.Part0 = HumanoidRootPart
-    weld.Part1 = marker
-
-    local Connect
-    Connect = RunService.Stepped:Connect(function ()
-        if not character:FindFirstChild("HumanoidRootPart") or not plrCharacter or not plrCharacter:FindFirstChild("HumanoidRootPart") or
-        not Markers[character.Name] or (plrCharacter.HumanoidRootPart.Position - marker.Position).Magnitude > MARKERRENDERDISTANCE then
-            Connect:Disconnect()
-            Connect = nil
-            weld:Destroy()
-            DeleteMarker(character.Name)
-        else
-            local offset = HumanoidRootPart.CFrame:VectorToObjectSpace(character.HumanoidRootPart.AssemblyLinearVelocity) * Ping/1000 * 1.3 --- * character.HumanoidRootPart.AssemblyLinearVelocity.Magnitude
-            weld.C0 = CFrame.new(offset) * CFrame.Angles(math.rad(90),math.rad(90),0)
-        end
-    end)
-end
-local DestroyMarkers = function ()
-    for i, _ in pairs(Markers) do
-        DeleteMarker(i)
-    end
-end
-local CreateMarkers = function()
-	for _, plyr in ipairs(living:GetChildren()) do
-        local humanoidRootPart
-        if plyr then humanoidRootPart = plyr:FindFirstChild("HumanoidRootPart") end
-        if humanoidRootPart and plrCharacter and plrCharacter:FindFirstChild("HumanoidRootPart") then
-            local playerPosition = humanoidRootPart.Position
-            local distance = (playerPosition - plrCharacter.HumanoidRootPart.Position).Magnitude
-            if plyr.Name ~= plr.Name and distance < MARKERRENDERDISTANCE and not Markers[plyr.Name] and MARKERTOGGLE then
-                CreateMarker(plyr)
-            end
-        end
-    end
-end
-local MarkersConnetion
-MarkersConnetion = RunService.Stepped:Connect(CreateMarkers)
----
-
--- Класс Indicators
-Indicators = {}
-Indicators.__index = Indicators
-
--- Таблица для хранения всех индикаторов
-Indicators.indicators = {}
-
--- Конструктор
-function Indicators.new()
-    local self = setmetatable({}, Indicators)
-    return self
-end
-
-local indicators = Indicators.new()
-
--- Удаление индикатора для конкретного игрока
-function Indicators:Delete(player)
-    local indicator = self.indicators[player]
-    if indicator then
-        indicator.gui:Destroy()
-        self.indicators[player] = nil
-    else
-        warn("Indicator for this player does not exist!")
-    end
-end
-
--- Обновление прогресса оставшегося времени
-function Indicators:UpdateProgress(player)
-    local indicator = self.indicators[player]
-    if indicator then
-        local elapsedTime = tick() - indicator.startTime
-        local greenTime = 3
-        local redTime = 2
-
-        -- Обновляем размер зеленой полоски, уменьшая её с обоих концов
-        if indicator.greenBar then
-            local greenProgress = math.clamp((greenTime - elapsedTime) / greenTime, 0, 1)
-            indicator.greenBar.Size = UDim2.new(greenProgress, 0, 0.3, 0)
-            indicator.greenBar.Position = UDim2.new(0.5, 0, 0.5, 0)
-        end
-
-        -- Обновляем размер красной полоски, уменьшая её с обоих концов
-        if indicator.redBar then
-            local redProgress = math.clamp((redTime - elapsedTime) / redTime, 0, 1)
-            indicator.redBar.Size = UDim2.new(redProgress * 0.66, 0, 0.3, 0) -- Уменьшаем до 66% ширины
-            indicator.redBar.Position = UDim2.new(0.5, 0, 0.5, 0)
-        end
-
-        -- Удаление индикатора, когда время истекло
-        if elapsedTime >= greenTime or not player then
-            self:Delete(player)
-        end
-    end
-end
-
-
--- Создание индикатора для игрока
-function Indicators:Create(player, type)
-    if self.indicators[player] then
-        warn("Indicator for this player already exists!")
-        return
-    end
-    
-    -- Создаем BillboardGui и настраиваем его
-    local billboardGui = Instance.new("BillboardGui")
-    billboardGui.Size = UDim2.new(10, 0, 5, 0)
-    billboardGui.StudsOffset = Vector3.new(0, 3, 0)
-    billboardGui.AlwaysOnTop = true
-    
-    -- Зеленая полоска для 3 секунд, укорачивается с обоих концов
-    local greenBar
-    if type ~= "pb" then
-        greenBar = Instance.new("Frame", billboardGui)
-        greenBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)  -- Зеленый цвет
-        greenBar.AnchorPoint = Vector2.new(0.5, 0.5)
-        greenBar.Position = UDim2.new(0.5, 0, 0.5, 0)         -- Центрируем полоску
-        greenBar.BorderSizePixel = 0
-    end
-
-    -- Красная полоска для 2 секунд, укорачивается с обоих концов
-    local redBar
-    if type ~= "bypassb" then
-        redBar = Instance.new("Frame", billboardGui)
-        redBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)    -- Красный цвет
-        redBar.AnchorPoint = Vector2.new(0.5, 0.5)
-        redBar.Position = UDim2.new(0.5, 0, 0.5, 0)           -- Центрируем полоску
-        redBar.BorderSizePixel = 0
-    end
-
-    -- Устанавливаем BillboardGui на игрока
-    billboardGui.Parent = player:FindFirstChild("Head")
-    
-    -- Сохраняем индикатор в таблицу
-    self.indicators[player] = {gui = billboardGui, greenBar = greenBar, redBar = redBar, startTime = tick()}
-
-    RunService.Stepped:Connect(function ()
-        indicators:UpdateProgress(player)
-    end)
-
-end
-
--- Удаление всех индикаторов
-function Indicators:DeleteAll()
-    for player, indicator in pairs(self.indicators) do
-        indicator.gui:Destroy()
-        self.indicators[player] = nil
-    end
-end
-
-local IsInStun = function (playerCharacter)
-    if playerCharacter:GetAttribute("StunnedEffect") then return true end
-    return false
-end
-local IsBlockBreak = function (attach)
-    if attach and attach:FindFirstChild("10") then
-        return true
-    end
-    return false
-end
-local IsPerfectBlock = function (attach)
-    if attach and attach:FindFirstChild("Spin") then
-        return true
-    end
-    return false
-end
-
-local BBindicatorAllowed = BBINDICATOR
-local BlockBreakListening = function (character)
-    if not character then return end
-    if not character or character.Blocking_Capacity.Value ~= 0 or not BBindicatorAllowed then return end
-    local attach = character:FindFirstChild("UpperTorso"):WaitForChild("HitAttach",0.03) -- !!!!!!!
-    local stunned = IsInStun(character)
-    if not stunned then return end
-    warn(character.Name,"stunned", stunned)
-    if attach then
-        local bb = IsBlockBreak(attach)
-        if bb then
-            indicators:Create(character, "bb")
-            return
-        end
-    else
-        warn(character.Name,"bypassed block", stunned)
-        indicators:Create(character, "bypassb")
-    end
-end
-local PerfectBlockListening = function (character)
-    if not character or not BBindicatorAllowed then return end
-    local stunned = IsInStun(character)
-    if not stunned then return end
-    local attach = character:FindFirstChild("UpperTorso"):WaitForChild("HitAttach",0.03)
-    local pb = IsPerfectBlock(attach)
-    if stunned and pb then
-        indicators:Create(character, "pb")
-        return
-    end
-end
-
-
-if BBindicatorAllowed then
-    for _, v in pairs(living:GetChildren()) do
-        spawn(function ()
-            local bc = v:WaitForChild("Blocking_Capacity",60)
-            if bc then
-                bc:GetPropertyChangedSignal("Value"):Connect(function ()
-                    BlockBreakListening(v)
-                end)
-            end
-            v:GetAttributeChangedSignal("StunnedEffect"):Connect(function ()
-                PerfectBlockListening(v)
-            end)
-        end)
-    end
-end
-local BlockBreakListeningConnection
-if BBindicatorAllowed then
-    BlockBreakListeningConnection = living.ChildAdded:Connect(function (child)
-        local bc = child:WaitForChild("Blocking_Capacity",60)
-        if bc then
-            bc:GetPropertyChangedSignal("Value"):Connect( function ()
-                BlockBreakListening(child)
-            end)
-        end
-        child:GetAttributeChangedSignal("StunnedEffect"):Connect(function ()
-            PerfectBlockListening(child)
-        end)
-    end)
-end
 
 function ScalePlayerBody(player, targetscale, partForScale)
     local character = player.Character
     if not character then return end
     local CurrentScale = function ()
         local torso = character:WaitForChild("LowerTorso",5)
-        local torsoOriginalSize = torso.OriginalSize.Value
+        local torsoOriginalSize = torso:WaitForChild("OriginalSize", 5).Value
         return torso.Size / torsoOriginalSize
     end
     local currentScale = CurrentScale()
@@ -1308,6 +1096,490 @@ end
 
 -------
 
+--- Stats module test
+
+local StatsObject = {}
+StatsObject.__index = StatsObject
+
+StatsObject.new = function ()
+    local self = setmetatable({}, StatsObject)
+    self.charContainer = {}
+    self.speaker = plr
+    self.speakerGui = PlayerGui
+
+    self.IsCharacterExists = function (character)
+        for _, char in pairs(living:GetChildren()) do
+            if char == character then
+                return true
+            end
+        end
+        return false
+    end
+    self.AddCharacter = function (character)
+        self.charContainer[character] = {
+            Holders = {},
+        }
+        self.charContainer[character].Holders["MainHolder"] = living.ChildRemoved:Connect(function(child)
+            if child ~= character then return end
+            warn(`trying to delete charContainer {child.Name}`)
+            if self.charContainer[child] then
+                self.DeleteCharacter(child)
+                warn(`deleted charContainer {child.Name}`)
+            end
+        end)
+        warn(`Character {character.Name} added to table`)
+    end
+    self.DeleteCharacter = function (character)
+        if not self.charContainer[character] then
+            warn(`Character {character.Name} can't be deleted (Not found)`)
+            return
+        end
+        for i, holder in pairs(self.charContainer[character].Holders) do
+            holder:Disconnect()
+            self.charContainer[character].Holders[i]:Disconnect()
+            warn(`holder {i} disconnected in {character.Name}`)
+        end
+        self.charContainer[character] = nil
+        warn(`Character {character.Name} removed from table`)
+    end
+
+    self.CanTs = function (character)
+        if not character then return end
+        local standkills = character:WaitForChild("StandSkills" ,5)
+        if not standkills then return false end
+        for _, skill in pairs(standkills:GetChildren()) do
+            if skill.Value == "The World" then
+                return true
+            end
+        end
+        return false
+    end
+
+    self.IsAnimation = function (humanoid, animationID)
+        if not humanoid then return end
+        if humanoid then
+            local animator = humanoid:WaitForChild("Animator",3)
+            for _, track in pairs(animator:GetPlayingAnimationTracks()) do
+                if track.Animation.AnimationId  == animationID then
+                    return true
+                end
+            end
+        end
+        return false
+    end
+
+    self.IsInStun = function (character)
+        if character:GetAttribute("StunnedEffect") then return true end
+        return false
+    end
+    self.IsBlockBreak = function (attach)
+        if attach and attach:FindFirstChild("10") then
+            return true
+        end
+        return false
+    end
+    self.IsPerfectBlock = function (attach)
+        if attach and attach:FindFirstChild("Spin") then
+            return true
+        end
+        return false
+    end
+
+    self.Destroy = function ()
+        for character, _ in pairs(self.charContainer) do
+            self.DeleteCharacter(character)
+        end
+    end
+    return self
+end
+
+function StatsObject:StartMonitoringCharacter(character)
+    if self.charContainer[character] then warn(`Object {character.Name} already exists`); return end
+    self.AddCharacter(character)
+    local PrimaryPart = character:WaitForChild("HumanoidRootPart", 30)
+    if not self.IsCharacterExists(character) then warn(`Object {character.Name} doesn't exist`); return end
+    if not PrimaryPart then warn(`Object {character.Name} exists, but have no PrimaryPart`); return end
+    print(`primary part added to {character.Name}, {PrimaryPart.Name}`)
+
+    local Holders = self.charContainer[character].Holders
+    
+    if FINDSTANDSANDSPECS then
+        spawn(function ()
+            self:CreateFindStandsAndSpec(character)
+        end)
+    end
+
+    if MARKERTOGGLE then
+        spawn(function ()
+            self:CreateRealPosMarker(character)
+        end)
+    end
+    spawn(function ()
+        self:CreateHpIndicator(character)
+    end)
+    --- TS NOTIFER
+    Holders["TsNotiferHolder"] = RunService.Stepped:Connect(function ()
+        local summonedStand = character:FindFirstChild("SummonedStand")
+        if not summonedStand or not summonedStand.Value then return end
+        local canTs = self.CanTs(character)
+        if not canTs then return end
+        local okDistance = self.speaker:DistanceFromCharacter(PrimaryPart.Position) < 200
+        if not okDistance then return end
+        local animationController = character:WaitForChild("StandMorph"):WaitForChild("AnimationController",5)
+        local isTsAnim = self.IsAnimation(animationController, "rbxassetid://4139325504")
+        if isTsAnim then
+            self:CreateTsNotifer(character)
+        end
+    end)
+    
+    
+    
+    local BlockBreakListening = function()
+        if character.Blocking_Capacity.Value ~= 0 then return end
+        if not self.charContainer[character] or self.charContainer[character].StunBar then return end
+        local attach = character:FindFirstChild("UpperTorso"):WaitForChild("HitAttach",0.03) -- !!!!!!!
+        local stunned = self.IsInStun(character)
+        if not stunned then return end
+        warn(character.Name,"stunned", stunned)
+        if attach then
+            local bb = self.IsBlockBreak(attach)
+            if bb then
+                self:CreateStunBar(character, "bb")
+                return
+            end
+        else
+            warn(character.Name,"bypassed block", stunned)
+            self:CreateStunBar(character, "bypassb")
+        end
+    end
+    local PerfectBlockListening = function()
+        if not self.charContainer[character] or self.charContainer[character].StunBar then return end
+        local stunned = self.IsInStun(character)
+        if not stunned then return end
+        local attach = character:FindFirstChild("UpperTorso"):WaitForChild("HitAttach",0.03)
+        local pb = self.IsPerfectBlock(attach)
+        if stunned and pb then
+            self:CreateStunBar(character, "pb")
+            return
+        end
+    end
+
+    if BBINDICATOR then
+        local bc = character:WaitForChild("Blocking_Capacity",60)
+        if bc then
+            Holders["StunBarBbHolder"] = bc:GetPropertyChangedSignal("Value"):Connect(function ()
+                BlockBreakListening()
+            end)
+        end
+        Holders["StunBarPbHolder"] = character:GetAttributeChangedSignal("StunnedEffect"):Connect(function ()
+            PerfectBlockListening()
+        end)
+    end
+end
+
+function StatsObject:CreateFindStandsAndSpec(character)
+    if not character.PrimaryPart then warn(`No PrimaryPart of {character.Name}`); return end
+    local charactersPlayer = Players:GetPlayerFromCharacter(character)
+    if not charactersPlayer then return end
+    local characterStats = charactersPlayer:WaitForChild("PlayerStats", 1000)
+    local Stand = characterStats.Stand.Value
+    local Spec  = characterStats.Spec.Value
+    local IsStand, IsSpec = FINDSTANDS[Stand], FINDSPECS[Spec]
+    if not (IsStand or IsSpec) then return end
+    self.charContainer[character].FindStandsAndSpec = true
+
+    local Gui = Instance.new("BillboardGui", character.HumanoidRootPart)
+    Gui.Name = "FindStandsAndSpec"
+    Gui.Size = UDim2.new(4, 0, 1, 0)
+    Gui.StudsOffset = Vector3.new(0, 10, 0)
+    Gui.AlwaysOnTop = true
+    Gui.Adornee = character.HumanoidRootPart
+
+    local CharName = Instance.new("TextLabel", Gui)
+    CharName.Name = "CharName"
+    CharName.Size = UDim2.new(1, 0, 1, 0)
+    CharName.BackgroundTransparency = 1
+    CharName.TextColor3 = Color3.fromRGB(255, 0, 0)
+    CharName.TextStrokeTransparency = 0
+    CharName.Font = Enum.Font.SourceSansBold
+    CharName.TextSize = 40
+    CharName.Text = string.format("Name: %q \n\n\n\n", character.Name)
+
+    local FindStand
+    if IsStand then
+        FindStand = Instance.new("TextLabel", Gui)
+        FindStand.Name = "FindStand"
+        FindStand.Size = UDim2.new(1, 0, 1, 0)
+        FindStand.BackgroundTransparency = 1
+        FindStand.TextColor3 = Color3.fromRGB(245, 166, 35)
+        FindStand.TextStrokeTransparency = 0
+        FindStand.Font = Enum.Font.SourceSansBold
+        FindStand.TextSize = 40
+        FindStand.Text = string.format("HP: %q \n\n", Stand)
+    end
+
+    local FindSpec
+    if IsSpec then
+        FindSpec = Instance.new("TextLabel", Gui)
+        FindSpec.Name = "FindSpec"
+        FindSpec.Size = UDim2.new(1, 0, 1, 0)
+        FindSpec.BackgroundTransparency = 1
+        FindSpec.TextColor3 = Color3.fromRGB(255, 255, 0)
+        FindSpec.TextStrokeTransparency = 0
+        FindSpec.Font = Enum.Font.SourceSansBold
+        FindSpec.TextSize = 40
+        FindSpec.Text = string.format("Spec: %q", Spec)
+    end
+
+    local Updater
+    local Destroy = function ()
+        if Updater then
+            Updater:Disconnect()
+            Updater = nil
+        end
+        if Gui then
+            Gui:Destroy()
+        end
+        if self.charContainer[character] then
+            self.charContainer[character].FindStandsAndSpec = false
+        end
+    end
+
+    local Update = function ()
+        if self.charContainer[character] and self.charContainer[character].FindStandsAndSpec then
+        else
+            Destroy()
+        end
+    end
+
+    Updater = RunService.Stepped:Connect(Update)
+end
+
+function StatsObject:CreateRealPosMarker(character)
+    if not character.PrimaryPart then warn(`No PrimaryPart of {character.Name}`); return end
+
+    self.charContainer[character].RealPosMarker = true
+    local Marker = Instance.new("Part", character.PrimaryPart)
+    Marker.Name = "RealPosMarker"
+    Marker.Shape = Enum.PartType.Cylinder
+    Marker.Size = Vector3.new(7, 2, 2)
+    Marker.Rotation = Vector3.new(0, 0, 90)
+    Marker.Color = Color3.fromRGB(0, 200, 200)
+    Marker.Transparency = 0.7
+    Marker.Anchored = false
+    Marker.Massless = true
+    Marker.CanCollide = false
+
+    local MarkerWeld = Instance.new("Weld", Marker)
+    MarkerWeld.Name = "MarkerWeld"
+    MarkerWeld.Part0 = character.HumanoidRootPart
+    MarkerWeld.Part1 = Marker
+
+    local Updater
+    local Destroy = function ()
+        if Updater then
+            print(`Updater:Disconnect() in {character.Name}`)
+            Updater:Disconnect()
+            Updater = nil
+        end
+        if Marker then
+            print(`Destroying marker in {character.Name}`)
+            Marker:Destroy()
+        end
+        if self.charContainer[character] and self.charContainer[character].RealPosMarker then
+            print(`RealPosMarker = false in {character.Name}`)
+            self.charContainer[character].RealPosMarker = false
+        end
+    end
+    local Update = function ()
+        if MarkerWeld and self.charContainer[character] and self.charContainer[character].RealPosMarker and character.HumanoidRootPart then
+            local offset = character.HumanoidRootPart.CFrame:VectorToObjectSpace(character.HumanoidRootPart.AssemblyLinearVelocity) * GetPing()/1000 * 1
+            MarkerWeld.C0 = CFrame.new(offset) * CFrame.Angles(math.rad(90),math.rad(90),0)
+        else
+            Destroy()
+        end
+    end
+
+    Updater = RunService.Stepped:Connect(Update)
+end
+
+function StatsObject:CreateTsNotifer(character)
+    if not character.HumanoidRootPart then warn(`No PrimaryPart of {character.Name}`); return end
+    self.charContainer[character].TsNotifer = true
+
+    warn(`{character.Name} TSING`)
+    local Gui = Instance.new("ScreenGui", self.speakerGui)
+    Gui.Name = "TsGui"
+
+    -- if self.speaker.PrimaryPart then
+    --     TsNotifer.TsSoundNotifer = Instance.new("Sound", self.speaker.PrimaryPart) ---!!!!!!!!!!!!!!!!!!! ДОДЕЛАТЬ
+    --     local TsSoundNotifer = TsNotifer.TsSoundNotifer
+    --     TsSoundNotifer.Name = "TsSoundNotifer"
+    -- end
+
+    local TsFrame = Instance.new("Frame", Gui)
+    TsFrame.Name = "TsFrame"
+    TsFrame.Size = UDim2.new(0.3, 0, 0.1, 0)
+    TsFrame.Position = UDim2.new(0.35, 0, 0, 0)
+    TsFrame.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+
+    local TsText = Instance.new("TextLabel", TsFrame)
+    TsText.Name = "TsText"
+    TsText.Size = UDim2.new(1, 0, 1, 0)
+    TsText.Position = UDim2.new(0, 0, 0, 0)
+    TsText.Text = character.Name
+    TsText.TextColor3 = Color3.fromRGB(200, 200, 200)
+    TsText.BackgroundTransparency = 1
+    TsText.Font = Enum.Font.SourceSans
+    TsText.TextScaled = true
+
+    local Destroy = function ()
+        Gui:Destroy()
+        if self.charContainer[character] then
+            self.charContainer[character].TsNotifer = false
+        end
+    end
+
+    delay(16, function()
+        Destroy()
+    end)
+end
+
+function StatsObject:CreateStunBar(character, type)
+    if not character.HumanoidRootPart then warn(`No PrimaryPart of {character.Name}`); return end
+    self.charContainer[character].StunBar = true
+
+    local Gui = Instance.new("BillboardGui", character.HumanoidRootPart)
+    Gui.Name = "StunBarBillboard"
+    Gui.Size = UDim2.new(4, 0, 1, 0)
+    Gui.StudsOffset = Vector3.new(0, 3, 0)
+    Gui.AlwaysOnTop = true
+
+    local GreenBar
+    if type ~= "pb" then
+        GreenBar = Instance.new("Frame", Gui)
+        GreenBar.Name = "GreenBar"
+        GreenBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        GreenBar.AnchorPoint = Vector2.new(0.5, 0.5)
+        GreenBar.Position = UDim2.new(0.5, 0, 0.5, 0)
+        GreenBar.BorderSizePixel = 0
+    end
+
+    local RedBar
+    if type ~= "bypassb" then
+        RedBar = Instance.new("Frame", Gui)
+        RedBar.Name = "RedBar"
+        RedBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        RedBar.AnchorPoint = Vector2.new(0.5, 0.5)
+        RedBar.Position = UDim2.new(0.5, 0, 0.5, 0)
+        RedBar.BorderSizePixel = 0
+    end
+
+    local Updater
+    local Destroy = function ()
+        Updater:Disconnect()
+        Gui:Destroy()
+        if self.charContainer[character] and self.charContainer[character].StunBar then
+            self.charContainer[character].StunBar = false
+        end
+    end
+    local startTime = tick()
+    local Update = function ()
+        local elapsedTime = tick() - startTime
+        local greenTime = 3
+        local redTime = 2
+
+        -- Обновляем размер зеленой полоски, уменьшая её с обоих концов
+        if GreenBar then
+            local greenProgress = math.clamp((greenTime - elapsedTime) / greenTime, 0, 1)
+            GreenBar.Size = UDim2.new(greenProgress, 0, 0.3, 0)
+            GreenBar.Position = UDim2.new(0.5, 0, 0.5, 0)
+        end
+
+        -- Обновляем размер красной полоски, уменьшая её с обоих концов
+        if RedBar then
+            local redProgress = math.clamp((redTime - elapsedTime) / redTime, 0, 1)
+            RedBar.Size = UDim2.new(redProgress * 0.66, 0, 0.3, 0) -- Уменьшаем до 66% ширины
+            RedBar.Position = UDim2.new(0.5, 0, 0.5, 0)
+        end
+
+        -- Удаление индикатора, когда время истекло
+        if GreenBar and elapsedTime >= greenTime or not GreenBar and RedBar and elapsedTime >= redTime or
+            not self.charContainer[character] or not self.charContainer[character].StunBar then
+            Destroy()
+        end
+    end
+
+    Updater = RunService.Stepped:Connect(Update)
+end
+
+function StatsObject:CreateHpIndicator(character)
+    if not character.HumanoidRootPart then warn(`No PrimaryPart of {character.Name}`); return end
+    self.charContainer[character].HpIndicator = true
+
+
+    local Gui = Instance.new("BillboardGui", character.HumanoidRootPart)
+    Gui.Name = "HpIndicatorBillboard"
+    Gui.Size = UDim2.new(4, 0, 1, 0)
+    Gui.StudsOffset = Vector3.new(0, 4, 0)
+    Gui.AlwaysOnTop = false
+    Gui.Adornee = character.HumanoidRootPart
+
+    local HealthText = Instance.new("TextLabel", Gui)
+    HealthText.Name = "HealthText"
+    HealthText.Size = UDim2.new(1, 0, 1, 0)
+    HealthText.BackgroundTransparency = 1
+    HealthText.TextColor3 = Color3.fromRGB(255, 0, 0)
+    HealthText.TextStrokeTransparency = 0
+    HealthText.Font = Enum.Font.SourceSansBold
+    HealthText.TextSize = 24
+    local Health = character:WaitForChild("Health", 10000)
+    HealthText.Text = string.format("HP: %d / %d", character.Health.Value, character.Health.MaxValue)
+
+    local Updater
+    local Destroy = function ()
+        if Updater then
+            print(`Updater:Disconnect() in {character.Name}`)
+            Updater:Disconnect()
+            Updater = nil
+        end
+        if Gui then
+            Gui:Destroy()
+        end
+        if self.charContainer[character] then
+            self.charContainer[character].HpIndicator = false
+        end
+    end
+
+    local Update = function ()
+        if HealthText and self.charContainer[character] and self.charContainer[character].HpIndicator then
+            Health = character:FindFirstChild("Health")
+            if not Health then return end
+            local currentHealth = Health.Value
+            local maxHealth = Health.MaxValue
+            HealthText.Text = string.format("HP: %d / %d", currentHealth, maxHealth)
+        else
+            Destroy()
+        end
+    end
+
+    Updater = RunService.Stepped:Connect(Update)
+end
+
+
+
+local PlayersControlContainer = StatsObject.new()
+local PlayersControlContainerConnection
+PlayersControlContainerConnection = living.ChildAdded:Connect(function(child)
+    PlayersControlContainer:StartMonitoringCharacter(child)
+end)
+for _, v in pairs(living:GetChildren()) do
+    spawn(function ()
+        PlayersControlContainer:StartMonitoringCharacter(v)
+    end)
+end
+---
+
 
 local RestoreOcean = function ()
     if workspace.Map:FindFirstChild("IMPORTANT") and workspace.Map.IMPORTANT:FindFirstChild("Ocean") then
@@ -1320,22 +1592,32 @@ local CharacterAddedConnection = plr.CharacterAdded:Connect(OnCharacterAdded)
 local ScriptConnection
 ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProcessed)
     if input.KeyCode == Enum.KeyCode.L and not gameProcessed then
-        getgenv().IsValeraScriptRunning = false
-        print("Скрипт выключен")
-        indicators:DeleteAll()
 
-        BBindicatorAllowed = false
 
-        if AdjustBodyConnection then
-            AdjustBodyConnection:Disconnect()
-            AdjustBodyConnection = nil
-        end
-
-        for _, v in pairs(living:GetChildren()) do
-            delay(2, function ()
-                ReverceAdjustBody(v)
+        
+        if PlayersControlContainerConnection then
+            PlayersControlContainerConnection:Disconnect()
+            spawn(function ()
+                PlayersControlContainer:Destroy()
             end)
+            PlayersControlContainerConnection = nil
         end
+
+        -- indicators:DeleteAll()
+
+        
+        -- BBindicatorAllowed = false
+
+        -- if AdjustBodyConnection then
+        --     AdjustBodyConnection:Disconnect()
+        --     AdjustBodyConnection = nil
+        -- end
+
+        -- for _, v in pairs(living:GetChildren()) do
+        --     delay(2, function ()
+        --         ReverceAdjustBody(v)
+        --     end)
+        -- end
 
         if BlockBreakListeningConnection then
             BlockBreakListeningConnection:Disconnect()
@@ -1356,7 +1638,7 @@ ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProc
             MarkersConnetion = nil
         end
 
-        DestroyMarkers()
+        -- DestroyMarkers()
 
         if GetPingConnection then
             GetPingConnection:Disconnect()
@@ -1407,6 +1689,8 @@ ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProc
             ScriptConnection = nil
         end
         RestoreOcean()
+        getgenv().IsValeraScriptRunning = false
+        print("Скрипт выключен")
     end
 end)
 local HideOcean = function ()
