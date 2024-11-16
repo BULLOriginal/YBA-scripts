@@ -1289,6 +1289,7 @@ function StatsObject:CreateFindStandsAndSpec(character)
     local charactersPlayer = Players:GetPlayerFromCharacter(character)
     if not charactersPlayer then return end
     local characterStats = charactersPlayer:WaitForChild("PlayerStats", 1000)
+    wait(3)
     local Stand = characterStats.Stand.Value
     local Spec  = characterStats.Spec.Value
     local IsStand, IsSpec = FINDSTANDS[Stand], FINDSPECS[Spec]
