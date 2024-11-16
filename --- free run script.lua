@@ -254,7 +254,7 @@ local FightKick = function()
     -- local function blockInput(actionName, inputState, inputObject)
     --     return Enum.ContextActionResult.Sink -- Игнорируем весь ввод
     -- end
-    ContextActionService:BindAction("BlockInput", blockInput, false, unpack(Enum.UserInputType:GetEnumItems()))
+    -- ContextActionService:BindAction("BlockInput", blockInput, false, unpack(Enum.UserInputType:GetEnumItems()))
     while increment < 0.25 do
         OneFrameWait()
         -- print(increment)
@@ -262,7 +262,7 @@ local FightKick = function()
     FightKickFlag = false
     wait(0.5)
     plr.DevEnableMouseLock = true
-    ContextActionService:UnbindAction("BlockInput")
+    -- ContextActionService:UnbindAction("BlockInput")
     increment = 0.1
 end
 
