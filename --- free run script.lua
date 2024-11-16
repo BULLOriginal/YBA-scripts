@@ -318,7 +318,6 @@ end
 
 local OnCharacterAdded = function(character)
     plrCharacter = character
-    AdjustHumanoidHpDistance()
     if AIM then
         CreateAim()
     end
@@ -333,6 +332,8 @@ local OnCharacterAdded = function(character)
     AlwaysSprintingConnect = RunService.Stepped:Connect(StartSprinting)
     
     FightKick()
+
+    AdjustHumanoidHpDistance()
 end
 ---toggle stand
 local ToggleStand = function (toggle)
@@ -1598,9 +1599,6 @@ local CharacterAddedConnection = plr.CharacterAdded:Connect(OnCharacterAdded)
 local ScriptConnection
 ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProcessed)
     if input.KeyCode == Enum.KeyCode.L and not gameProcessed then
-
-
-        
         if PlayersControlContainerConnection then
             PlayersControlContainerConnection:Disconnect()
             spawn(function ()
@@ -1608,22 +1606,6 @@ ScriptConnection = UserInputService.InputBegan:Connect(function (input, gameProc
             end)
             PlayersControlContainerConnection = nil
         end
-
-        -- indicators:DeleteAll()
-
-        
-        -- BBindicatorAllowed = false
-
-        -- if AdjustBodyConnection then
-        --     AdjustBodyConnection:Disconnect()
-        --     AdjustBodyConnection = nil
-        -- end
-
-        -- for _, v in pairs(living:GetChildren()) do
-        --     delay(2, function ()
-        --         ReverceAdjustBody(v)
-        --     end)
-        -- end
 
         if BlockBreakListeningConnection then
             BlockBreakListeningConnection:Disconnect()
