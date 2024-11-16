@@ -87,11 +87,11 @@ if type(SPECTATORKEY) ~= "string" or SPECTATORKEY == nil then
 end
 if type(FINDSTANDS) ~= "table" or FINDSTANDS == {} or FINDSTANDS == nil then
     FINDSTANDS = {
-        ["Star platinum"] = true,
-        ["Hermit Purple"] = true,
-        ["Golden Experience"] = true,
-        ["Crazy Diamond"] = true,
-        ["Stone Free"] = true,
+        -- ["Star platinum"] = true,
+        -- ["Hermit Purple"] = true,
+        -- ["Golden Experience"] = true,
+        -- ["Crazy Diamond"] = true,
+        -- ["Stone Free"] = true,
     }
 end
 if type(FINDSPECS) ~= "table" or FINDSPECS == {} or FINDSPECS == nil then
@@ -757,14 +757,16 @@ if plrCharacter:FindFirstChild("StandSkills") then
         local HasLearned = plr.StandSkillTree:FindFirstChild(Cval)
         if FindKeyByValue(ExceptSkills, Cval) or (HasLearned and HasLearned.Value == true) then
             print("Custom:",Cval, "bind to", Ckey)
-            TrueStandKeyBinds[Ckey] = Cval
+            if not TrueStandKeyBinds[Ckey] or TrueStandKeyBinds[Ckey] and not FindKeyByValue(ExceptSkills, TrueSpecKeyBinds[Ckey]) then
+                TrueStandKeyBinds[Ckey] = Cval
+            end
         end
     end
     -- TrueStandKeyBinds[Ckey] = Cval
     for _, key in pairs(plrCharacter.StandSkills:GetChildren()) do
         local keyvalue = key.Value
         local HasLearned = plr.StandSkillTree:FindFirstChild(keyvalue)
-        if FindKeyByValue(ExceptSkills, keyvalue) or 
+        if FindKeyByValue(ExceptSkills, keyvalue) and not TrueStandKeyBinds[key.Name] or 
         (not FindKeyByValue(TrueStandKeyBinds, keyvalue) and HasLearned and HasLearned.Value == true)  then
             print("Default:",keyvalue, "bind to", key.Name)
             TrueStandKeyBinds[key.Name] = keyvalue
@@ -777,7 +779,7 @@ if plrCharacter:FindFirstChild("SpecSkills") then
         local HasLearned = plr.SpecSkillTree:FindFirstChild(Cval)
         if HasLearned and HasLearned.Value == true then
             print("Custom:",Cval, "bind to", Ckey)
-            TrueSpecKeyBinds[Ckey] = Cval 
+            TrueSpecKeyBinds[Ckey] = Cval
         end
     end
     for _, key in pairs(plrCharacter.SpecSkills:GetChildren()) do
@@ -1318,7 +1320,7 @@ function StatsObject:CreateFindStandsAndSpec(character)
         FindStand.TextColor3 = Color3.fromRGB(245, 166, 35)
         FindStand.TextStrokeTransparency = 0
         FindStand.Font = Enum.Font.SourceSansBold
-        FindStand.TextSize = 40
+        FindStand.TextSize = 30
         FindStand.Text = string.format("HP: %q \n\n", Stand)
     end
 
@@ -1331,7 +1333,7 @@ function StatsObject:CreateFindStandsAndSpec(character)
         FindSpec.TextColor3 = Color3.fromRGB(255, 255, 0)
         FindSpec.TextStrokeTransparency = 0
         FindSpec.Font = Enum.Font.SourceSansBold
-        FindSpec.TextSize = 40
+        FindSpec.TextSize = 30
         FindSpec.Text = string.format("Spec: %q", Spec)
     end
 
@@ -1444,7 +1446,7 @@ function StatsObject:CreateTsNotifer(character)
         end
     end
 
-    delay(16, function()
+    delay(4, function()
         Destroy()
     end)
 end
