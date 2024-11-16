@@ -18,7 +18,11 @@
 -- SPECTATORKEY = "J"
 -- FINDSTANDSANDSPECS = true
 -- FINDSTANDS = {
---     ["Star platinum"] = true,
+--     ["Star Platinum"] = true,
+    -- ["Hermit Purple"] = true,
+    -- ["Gold Experience"] = true,
+    -- ["Crazy Diamond"] = true,
+    -- ["Stone Free"] = true,
 -- }
 -- FINDSPECS = {
 --     ["Boxing"] = true,
@@ -81,7 +85,7 @@ end
 if type(SPECTATORKEY) ~= "string" or SPECTATORKEY == nil then
     SPECTATORKEY = "J"
 end
-if type(FINDSTANDS) ~= "table" or FINDSTANDS == nil then
+if type(FINDSTANDS) ~= "table" or FINDSTANDS == {} or FINDSTANDS == nil then
     FINDSTANDS = {
         ["Star platinum"] = true,
         ["Hermit Purple"] = true,
@@ -90,7 +94,7 @@ if type(FINDSTANDS) ~= "table" or FINDSTANDS == nil then
         ["Stone Free"] = true,
     }
 end
-if type(FINDSPECS) ~= "table" or FINDSPECS == nil then
+if type(FINDSPECS) ~= "table" or FINDSPECS == {} or FINDSPECS == nil then
     FINDSPECS = {
         ["Boxing"] = false,
         ["Hamon (Caesar Zeppeli)"] = true,
@@ -786,26 +790,26 @@ if plrCharacter:FindFirstChild("SpecSkills") then
     end
 end
 
--- local FoundPoses = {}
--- local AddPoseToMemory = function (Pose)
---     if not FoundPoses[Pose.Name] then
---         FoundPoses[Pose.Name] = Pose
---     end
--- end
--- local GetPoseByName = function (Name)
---     local animDir = ReplicatedStorage:FindFirstChild("Anims")
---     local foundAnim
---     for _, v in pairs(animDir:GetDescendants()) do
---         if v:IsA("Animation") and v.Name == Name then
---             foundAnim = true
---             AddPoseToMemory(v)
---         end
---     end
---     if not foundAnim then
---         warn(`No poses with provided name \"{CHOOSECUSTOMPOSE}\" found`)
---         AddPoseToMemory(game:GetService("ReplicatedStorage").Anims.Poses["T-Pose"])
---     end
--- end
+local FoundPoses = {}
+local AddPoseToMemory = function (Pose)
+    if not FoundPoses[Pose.Name] then
+        FoundPoses[Pose.Name] = Pose
+    end
+end
+local GetPoseByName = function (Name)
+    local animDir = ReplicatedStorage:FindFirstChild("Anims")
+    local foundAnim
+    for _, v in pairs(animDir:GetDescendants()) do
+        if v:IsA("Animation") and v.Name == Name then
+            foundAnim = true
+            AddPoseToMemory(v)
+        end
+    end
+    if not foundAnim then
+        warn(`No poses with provided name \"{CHOOSECUSTOMPOSE}\" found`)
+        AddPoseToMemory(game:GetService("ReplicatedStorage").Anims.Poses["T-Pose"])
+    end
+end
 local StartPosing = function ()
     if CUSTOMPOSE then
         UseSkill({  ["PlayerIdle"] = FoundPoses[CHOOSECUSTOMPOSE],
@@ -822,8 +826,8 @@ local StopPosing = function ()
         UseSkill(_,"StopPosing")
     end
 end
--- GetPoseByName(CHOOSECUSTOMPOSE)
--- GetPoseByName(CHOOSESTANDPOSE)
+GetPoseByName(CHOOSECUSTOMPOSE)
+GetPoseByName(CHOOSESTANDPOSE)
 
 local NoSpamSkills = {
     "Shell Form",
