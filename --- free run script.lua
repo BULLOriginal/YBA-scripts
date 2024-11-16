@@ -611,6 +611,7 @@ local AimHelpSkillsList = {
     "Wormhole Uppercut",
     "Dimensional Victim Clone",
     "Infinite Speed",
+    "Time Switch"
     }
 
 
