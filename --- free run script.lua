@@ -1442,7 +1442,9 @@ function StatsObject:CreateTsNotifer(character)
     TsText.TextScaled = true
 
     local Destroy = function ()
-        Gui:Destroy()
+        while Gui and RunService.Stepped:Wait() do
+            Gui:Destroy()
+        end
         if self.charContainer[character] then
             self.charContainer[character].TsNotifer = false
         end
