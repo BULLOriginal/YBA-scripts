@@ -46,7 +46,7 @@ if type(IMPALEGLITCHFLAG) ~= "boolean" or IMPALEGLITCHFLAG == nil then
     IMPALEGLITCHFLAG = true
 end
 if type(MARKERTOGGLE) ~= "boolean" or MARKERTOGGLE == nil then
-    MARKERTOGGLE = true
+    MARKERTOGGLE = false
 end
 if type(AIM) ~= "boolean" or AIM == nil then
     AIM = true
@@ -772,8 +772,8 @@ if plrCharacter:FindFirstChild("StandSkills") then
     for _, key in pairs(plrCharacter.StandSkills:GetChildren()) do
         local keyvalue = key.Value
         local HasLearned = plr.StandSkillTree:FindFirstChild(keyvalue)
-        if FindKeyByValue(ExceptSkills, keyvalue) and not TrueStandKeyBinds[key.Name] or 
-        (not FindKeyByValue(TrueStandKeyBinds, keyvalue) and HasLearned and HasLearned.Value == true)  then
+        if (FindKeyByValue(ExceptSkills, keyvalue) or not FindKeyByValue(TrueStandKeyBinds, keyvalue) and HasLearned and HasLearned.Value == true) and
+        not TrueStandKeyBinds[key.Name] then
             print("Default:",keyvalue, "bind to", key.Name)
             TrueStandKeyBinds[key.Name] = keyvalue
         end
@@ -1128,13 +1128,15 @@ StatsObject.new = function ()
         {
             Id = "rbxassetid://6857250477",
             PlaybackRegionsEnabled = true,
-            PlaybackRegion = NumberRange.new(0,1)
+            PlaybackRegion = NumberRange.new(0,1),
+            Volume = 10,
         },
         ["Tornado Overdrive"] = {
             Id = "rbxassetid://119792224644266"
         },
         ["fart meme"] = {
             Id = "rbxassetid://4809574295",
+            Volume = 10,
         }
     }
 
