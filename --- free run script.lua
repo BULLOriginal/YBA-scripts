@@ -1,6 +1,7 @@
 --- free run script
 ---Добавить значение к СКОРОСТИ БЕГА (Меньше = меньше шанс кика)
 
+-- FUNSOUNDS = true
 -- PETUHVIEW = true
 -- IMPALEGLITCHFLAG = true
 -- MARKERTOGGLE = true
@@ -35,6 +36,9 @@
 --     ["Vampirism"] = true,
 -- }
 
+if type(FUNSOUNDS) ~= "boolean" or FUNSOUNDS == nil then
+    FUNSOUNDS = true
+end
 if type(PETUHVIEW) ~= "boolean" or PETUHVIEW == nil then
     PETUHVIEW = true
 end
@@ -996,7 +1000,7 @@ local MarkAnkh = function(object)
         beam.Color = ColorSequence.new(Color3.fromRGB(0, 255, 0))
     end
 
-    print("beamCreated")
+    -- print("beamCreated")
 
     wait(3)
     if UpdateBeamConnection then
@@ -1115,6 +1119,33 @@ StatsObject.new = function ()
     self.speaker = plr
     self.speakerGui = PlayerGui
 
+    self.SoundStorage = {
+        ["m2"] =
+        {
+            Id = "rbxassetid://163619849",
+        },
+        ["fart with reverb"] =
+        {
+            Id = "rbxassetid://6857250477",
+            PlaybackRegionsEnabled = true,
+            PlaybackRegion = NumberRange.new(0,1)
+        },
+        ["Tornado Overdrive"] = {
+            Id = "rbxassetid://119792224644266"
+        },
+        ["fart meme"] = {
+            Id = "rbxassetid://4809574295",
+        }
+    }
+
+    self.SoundNameWithParam = function (param, value)
+        for key, table in pairs(self.SoundStorage) do
+            if table[param] and table[param] == value then
+                return key
+            end
+        end
+    end
+
     self.IsCharacterExists = function (character)
         for _, char in pairs(living:GetChildren()) do
             if char == character then
@@ -1129,26 +1160,26 @@ StatsObject.new = function ()
         }
         self.charContainer[character].Holders["MainHolder"] = living.ChildRemoved:Connect(function(child)
             if child ~= character then return end
-            warn(`trying to delete charContainer {child.Name}`)
+            -- warn(`trying to delete charContainer {child.Name}`)
             if self.charContainer[child] then
                 self.DeleteCharacter(child)
-                warn(`deleted charContainer {child.Name}`)
+                -- warn(`deleted charContainer {child.Name}`)
             end
         end)
-        warn(`Character {character.Name} added to table`)
+        -- warn(`Character {character.Name} added to table`)
     end
     self.DeleteCharacter = function (character)
         if not self.charContainer[character] then
-            warn(`Character {character.Name} can't be deleted (Not found)`)
+            -- warn(`Character {character.Name} can't be deleted (Not found)`)
             return
         end
         for i, holder in pairs(self.charContainer[character].Holders) do
             holder:Disconnect()
             self.charContainer[character].Holders[i]:Disconnect()
-            warn(`holder {i} disconnected in {character.Name}`)
+            -- warn(`holder {i} disconnected in {character.Name}`)
         end
         self.charContainer[character] = nil
-        warn(`Character {character.Name} removed from table`)
+        -- warn(`Character {character.Name} removed from table`)
     end
 
     self.CanTs = function (character)
@@ -1204,13 +1235,19 @@ end
 function StatsObject:StartMonitoringCharacter(character)
     if self.charContainer[character] then warn(`Object {character.Name} already exists`); return end
     self.AddCharacter(character)
-    local PrimaryPart = character:WaitForChild("HumanoidRootPart", 30)
+    local PrimaryPart = character:WaitForChild("HumanoidRootPart", 60)
     if not self.IsCharacterExists(character) then warn(`Object {character.Name} doesn't exist`); return end
     if not PrimaryPart then warn(`Object {character.Name} exists, but have no PrimaryPart`); return end
-    print(`primary part added to {character.Name}, {PrimaryPart.Name}`)
+    -- print(`primary part added to {character.Name}, {PrimaryPart.Name}`)
 
     local Holders = self.charContainer[character].Holders
     
+    if FUNSOUNDS then
+        spawn(function ()
+            self:CreateSoundReplacer(character)
+        end)
+    end
+
     if FINDSTANDSANDSPECS then
         spawn(function ()
             self:CreateFindStandsAndSpec(character)
@@ -1248,7 +1285,7 @@ function StatsObject:StartMonitoringCharacter(character)
         local attach = character:FindFirstChild("UpperTorso"):WaitForChild("HitAttach",0.03) -- !!!!!!!
         local stunned = self.IsInStun(character)
         if not stunned then return end
-        warn(character.Name,"stunned", stunned)
+        -- warn(character.Name,"stunned", stunned)
         if attach then
             local bb = self.IsBlockBreak(attach)
             if bb then
@@ -1256,7 +1293,7 @@ function StatsObject:StartMonitoringCharacter(character)
                 return
             end
         else
-            warn(character.Name,"bypassed block", stunned)
+            -- warn(character.Name,"bypassed block", stunned)
             self:CreateStunBar(character, "bypassb")
         end
     end
@@ -1286,7 +1323,7 @@ function StatsObject:StartMonitoringCharacter(character)
 end
 
 function StatsObject:CreateFindStandsAndSpec(character)
-    if not character.PrimaryPart then warn(`No PrimaryPart of {character.Name}`); return end
+    if not character.PrimaryPart then return end
     local charactersPlayer = Players:GetPlayerFromCharacter(character)
     if not charactersPlayer then return end
     local characterStats = charactersPlayer:WaitForChild("PlayerStats", 1000)
@@ -1364,8 +1401,68 @@ function StatsObject:CreateFindStandsAndSpec(character)
     Updater = RunService.Stepped:Connect(Update)
 end
 
+function StatsObject:CreateSoundReplacer(character)
+    if not character.PrimaryPart then return end
+    self.charContainer[character].SoundReplacer = true
+
+    local SoundStorage = self.SoundStorage
+    local SoundNameWithParam = self.SoundNameWithParam
+
+    -- ["original sound id"] = "custom sound id" -- "original sound" to "custom sound"
+    local SoundReplaceList = {
+        -- ["Ora Kicks"] = "Fart1"
+        ["m2"] = "fart with reverb",
+        ["Tornado Overdrive"] = "fart meme"
+    }
+
+    local ReplaceSound = function (originalSoundObject)
+        local nameOfOriginalSoundObject = SoundNameWithParam("Id", originalSoundObject.SoundId)
+        local customSoundName = SoundReplaceList[nameOfOriginalSoundObject]
+        if not customSoundName then warn(`no customSoundName`); return end
+        local newSound = Instance.new("Sound", originalSoundObject)
+        newSound.SoundId = SoundStorage[customSoundName]["Id"]
+        newSound.Volume = originalSoundObject.Volume * (SoundStorage[customSoundName].Volume or 1)
+        newSound.Looped = originalSoundObject.Looped
+        newSound.PlaybackRegionsEnabled = SoundStorage[customSoundName].PlaybackRegionsEnabled or false
+        newSound.PlaybackRegion = SoundStorage[customSoundName].PlaybackRegion or NumberRange.new(0, math.huge)
+
+        newSound.Playing = true
+        originalSoundObject.Volume = 0
+    end
+
+    local Updater
+    local Destroy = function ()
+        if Updater then
+            Updater:Disconnect()
+            Updater = nil
+        end
+        if self.charContainer[character] then
+            self.charContainer[character].SoundReplacer = false
+        end
+    end
+
+    local Update = function (descendant)
+        if self.charContainer[character] and self.charContainer[character].SoundReplacer then
+            if not descendant:isA("Sound") then return end
+            local nameOfOriginalSoundObject = SoundNameWithParam("Id", descendant.SoundId)
+            if not nameOfOriginalSoundObject then return end
+            warn(`{nameOfOriginalSoundObject}`)
+            if nameOfOriginalSoundObject and SoundReplaceList[nameOfOriginalSoundObject] then
+                local originalSoundObject = descendant
+                ReplaceSound(originalSoundObject)
+            end
+        else
+            Destroy()
+        end
+    end
+
+    Updater = character.DescendantAdded:Connect(function (descendant)
+        Update(descendant)
+    end)
+end
+
 function StatsObject:CreateRealPosMarker(character)
-    if not character.PrimaryPart then warn(`No PrimaryPart of {character.Name}`); return end
+    if not character.PrimaryPart then return end
 
     self.charContainer[character].RealPosMarker = true
     local Marker = Instance.new("Part", character.PrimaryPart)
@@ -1387,16 +1484,16 @@ function StatsObject:CreateRealPosMarker(character)
     local Updater
     local Destroy = function ()
         if Updater then
-            print(`Updater:Disconnect() in {character.Name}`)
+            -- print(`Updater:Disconnect() in {character.Name}`)
             Updater:Disconnect()
             Updater = nil
         end
         if Marker then
-            print(`Destroying marker in {character.Name}`)
+            -- print(`Destroying marker in {character.Name}`)
             Marker:Destroy()
         end
         if self.charContainer[character] and self.charContainer[character].RealPosMarker then
-            print(`RealPosMarker = false in {character.Name}`)
+            -- print(`RealPosMarker = false in {character.Name}`)
             self.charContainer[character].RealPosMarker = false
         end
     end
@@ -1413,10 +1510,10 @@ function StatsObject:CreateRealPosMarker(character)
 end
 
 function StatsObject:CreateTsNotifer(character)
-    if not character.HumanoidRootPart then warn(`No PrimaryPart of {character.Name}`); return end
+    if not character.HumanoidRootPart then return end
     self.charContainer[character].TsNotifer = true
 
-    warn(`{character.Name} TSING`)
+    -- warn(`{character.Name} TSING`)
     local Gui = Instance.new("ScreenGui", self.speakerGui)
     Gui.Name = "TsGui"
 
@@ -1443,7 +1540,7 @@ function StatsObject:CreateTsNotifer(character)
     TsText.TextScaled = true
 
     local Destroy = function ()
-        while Gui and RunService.Stepped:Wait() do
+        while Gui and RunService.Stepped:Wait() do -- JJSploit иногда сразу не удаляет, потому цикл
             Gui:Destroy()
         end
         if self.charContainer[character] then
@@ -1451,13 +1548,12 @@ function StatsObject:CreateTsNotifer(character)
         end
     end
 
-    delay(4, function()
-        Destroy()
-    end)
+    wait(4)
+    Destroy()
 end
 
 function StatsObject:CreateStunBar(character, type)
-    if not character.HumanoidRootPart then warn(`No PrimaryPart of {character.Name}`); return end
+    if not character.HumanoidRootPart then return end
     self.charContainer[character].StunBar = true
 
     local Gui = Instance.new("BillboardGui", character.HumanoidRootPart)
@@ -1525,7 +1621,7 @@ function StatsObject:CreateStunBar(character, type)
 end
 
 function StatsObject:CreateHpIndicator(character)
-    if not character.HumanoidRootPart then warn(`No PrimaryPart of {character.Name}`); return end
+    if not character.HumanoidRootPart then return end
     self.charContainer[character].HpIndicator = true
 
 
@@ -1550,7 +1646,7 @@ function StatsObject:CreateHpIndicator(character)
     local Updater
     local Destroy = function ()
         if Updater then
-            print(`Updater:Disconnect() in {character.Name}`)
+            -- print(`Updater:Disconnect() in {character.Name}`)
             Updater:Disconnect()
             Updater = nil
         end
