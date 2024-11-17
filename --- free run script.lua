@@ -5,19 +5,22 @@
 -- PETUHVIEW = true
 -- IMPALEGLITCHFLAG = true
 -- MARKERTOGGLE = true
+-- MARKERRENDERDISTANCE = 200
 -- AIM = true
 -- BBINDICATOR = true
 -- STANDSKILLSPRIORITY = false
--- CUSTOMPOSE = false
 -- ADDTORUNSPEED = 11
--- MARKERRENDERDISTANCE = 200
--- FATPLAYERSSIZE = 3
--- THINFRIENDSSIZE = 0.3
+
+-- CUSTOMPOSE = false
 -- PARTFORSCALE = "LowerTorso"
 -- CHOOSECUSTOMPOSE = "T-Pose"
 -- CHOOSESTANDPOSE = nil
 -- SPECTATORKEY = "J"
 -- FINDSTANDSANDSPECS = true
+-- HPINDICATOR = true
+-- FATPLAYERSSIZE = 3
+-- THINFRIENDSSIZE = 0.3
+
 -- FINDSTANDS = {
 --     ["Star Platinum"] = true,
     -- ["Hermit Purple"] = true,
@@ -62,6 +65,9 @@ if type(CUSTOMPOSE) ~= "boolean" or CUSTOMPOSE == nil then
 end
 if type(FINDSTANDSANDSPECS) ~= "boolean" or FINDSTANDSANDSPECS == nil then
     FINDSTANDSANDSPECS = true
+end
+if type(HPINDICATOR) ~= "boolean" or HPINDICATOR == nil then
+    HPINDICATOR = true
 end
 
 if type(ADDTORUNSPEED) ~= "number" or ADDTORUNSPEED == nil then
@@ -1262,9 +1268,11 @@ function StatsObject:StartMonitoringCharacter(character)
             self:CreateRealPosMarker(character)
         end)
     end
-    spawn(function ()
-        self:CreateHpIndicator(character)
-    end)
+    if HPINDICATOR then
+        spawn(function ()
+            self:CreateHpIndicator(character)
+        end)
+    end
     --- TS NOTIFER
     Holders["TsNotiferHolder"] = RunService.Stepped:Connect(function ()
         local summonedStand = character:FindFirstChild("SummonedStand")
@@ -1329,7 +1337,9 @@ function StatsObject:CreateFindStandsAndSpec(character)
     if not character.PrimaryPart then return end
     local charactersPlayer = Players:GetPlayerFromCharacter(character)
     if not charactersPlayer then return end
-    local characterStats = charactersPlayer:WaitForChild("PlayerStats", 1000)
+    local characterStats = charactersPlayer:WaitForChild("PlayerStats", 20)
+    if not characterStats then return end
+
     wait(3)
     local Stand = characterStats.Stand.Value
     local Spec  = characterStats.Spec.Value
@@ -1427,7 +1437,7 @@ function StatsObject:CreateSoundReplacer(character)
         newSound.Volume = originalSoundObject.Volume * (SoundStorage[customSoundName].Volume or 1)
         newSound.Looped = originalSoundObject.Looped
         newSound.PlaybackRegionsEnabled = SoundStorage[customSoundName].PlaybackRegionsEnabled or false
-        newSound.PlaybackRegion = SoundStorage[customSoundName].PlaybackRegion or NumberRange.new(0, math.huge)
+        newSound.PlaybackRegion = SoundStorage[customSoundName].PlaybackRegion or NumberRange.new(0, 200)
 
         newSound.Playing = true
         originalSoundObject.Volume = 0
@@ -1588,6 +1598,7 @@ function StatsObject:CreateStunBar(character, type)
     local Updater
     local Destroy = function ()
         Updater:Disconnect()
+        Updater = nil
         Gui:Destroy()
         if self.charContainer[character] and self.charContainer[character].StunBar then
             self.charContainer[character].StunBar = false
@@ -1643,7 +1654,7 @@ function StatsObject:CreateHpIndicator(character)
     HealthText.TextStrokeTransparency = 0
     HealthText.Font = Enum.Font.SourceSansBold
     HealthText.TextSize = 24
-    local Health = character:WaitForChild("Health", 10000)
+    local Health = character:WaitForChild("Health", 10)
     HealthText.Text = string.format("HP: %d / %d", character.Health.Value, character.Health.MaxValue)
 
     local Updater
@@ -1662,7 +1673,7 @@ function StatsObject:CreateHpIndicator(character)
     end
 
     local Update = function ()
-        if HealthText and self.charContainer[character] and self.charContainer[character].HpIndicator then
+        if HealthText.Parent and self.charContainer[character] and self.charContainer[character].HpIndicator then
             Health = character:FindFirstChild("Health")
             if not Health then return end
             local currentHealth = Health.Value
@@ -1678,16 +1689,16 @@ end
 
 
 
-local PlayersControlContainer = StatsObject.new()
-local PlayersControlContainerConnection
-PlayersControlContainerConnection = living.ChildAdded:Connect(function(child)
-    PlayersControlContainer:StartMonitoringCharacter(child)
-end)
-for _, v in pairs(living:GetChildren()) do
-    spawn(function ()
-        PlayersControlContainer:StartMonitoringCharacter(v)
-    end)
-end
+-- local PlayersControlContainer = StatsObject.new()
+-- local PlayersControlContainerConnection
+-- PlayersControlContainerConnection = living.ChildAdded:Connect(function(child)
+--     PlayersControlContainer:StartMonitoringCharacter(child)
+-- end)
+-- for _, v in pairs(living:GetChildren()) do
+--     spawn(function ()
+--         PlayersControlContainer:StartMonitoringCharacter(v)
+--     end)
+-- end
 ---
 
 
