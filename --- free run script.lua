@@ -729,6 +729,7 @@ specItem = GetSpecItem()
 local ExceptSkills = {
     "Stand Barrage",
     "Stand Barrage Finisher",
+    "Heavy Chop",
     "Dash",
     "StartPosing"
 }
