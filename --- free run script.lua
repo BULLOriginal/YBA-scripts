@@ -8,7 +8,11 @@
 -- MARKERRENDERDISTANCE = 200
 -- AIM = true
 -- BBINDICATOR = true
+-- TSNOTIFER = true
 -- STANDSKILLSPRIORITY = false
+-- FINDSTANDSANDSPECS = true
+-- FINDALLPLAYERS = false
+-- HPINDICATOR = true
 -- ADDTORUNSPEED = 11
 
 -- CUSTOMPOSE = false
@@ -16,8 +20,6 @@
 -- CHOOSECUSTOMPOSE = "T-Pose"
 -- CHOOSESTANDPOSE = nil
 -- SPECTATORKEY = "J"
--- FINDSTANDSANDSPECS = true
--- HPINDICATOR = true
 -- FATPLAYERSSIZE = 3
 -- THINFRIENDSSIZE = 0.3
 
@@ -39,82 +41,139 @@
 --     ["Vampirism"] = true,
 -- }
 
-if type(FUNSOUNDS) ~= "boolean" or FUNSOUNDS == nil then
-    FUNSOUNDS = true
-end
-if type(PETUHVIEW) ~= "boolean" or PETUHVIEW == nil then
-    PETUHVIEW = true
-end
-if type(IMPALEGLITCHFLAG) ~= "boolean" or IMPALEGLITCHFLAG == nil then
-    IMPALEGLITCHFLAG = true
-end
-if type(MARKERTOGGLE) ~= "boolean" or MARKERTOGGLE == nil then
-    MARKERTOGGLE = false
-end
-if type(AIM) ~= "boolean" or AIM == nil then
-    AIM = true
-end
-if type(BBINDICATOR) ~= "boolean" or BBINDICATOR == nil then
-    BBINDICATOR = true
-end
-if type(STANDSKILLSPRIORITY) ~= "boolean" or STANDSKILLSPRIORITY == nil then
-    STANDSKILLSPRIORITY = false
-end
-if type(CUSTOMPOSE) ~= "boolean" or CUSTOMPOSE == nil then
-    CUSTOMPOSE = false
-end
-if type(FINDSTANDSANDSPECS) ~= "boolean" or FINDSTANDSANDSPECS == nil then
-    FINDSTANDSANDSPECS = true
-end
-if type(HPINDICATOR) ~= "boolean" or HPINDICATOR == nil then
-    HPINDICATOR = true
-end
 
-if type(ADDTORUNSPEED) ~= "number" or ADDTORUNSPEED == nil then
-    ADDTORUNSPEED = 11
-end
-if type(MARKERRENDERDISTANCE) ~= "number" or MARKERRENDERDISTANCE == nil then
-    MARKERRENDERDISTANCE = 200
-end
-if type(FATPLAYERSSIZE) ~= "number" or FATPLAYERSSIZE == 0 or FATPLAYERSSIZE == nil then
-    FATPLAYERSSIZE = 2
-end
-if type(THINFRIENDSSIZE) ~= "number" or THINFRIENDSSIZE == 0 or THINFRIENDSSIZE == nil then
-    THINFRIENDSSIZE = 0.3
-end
+local DefaultSettings = {
+    FUNSOUNDS = true,
+    PETUHVIEW = true,
+    IMPALEGLITCHFLAG = true,
+    MARKERTOGGLE = true,
+    MARKERRENDERDISTANCE = 200,
+    AIM = true,
+    BBINDICATOR = true,
+    TSNOTIFER = true,
+    STANDSKILLSPRIORITY = false,
+    FINDSTANDSANDSPECS = true,
+    FINDALLPLAYERS = false,
+    HPINDICATOR = true,
+    ADDTORUNSPEED = 11,
 
-if type(PARTFORSCALE) ~= "string" or PARTFORSCALE == nil then
-    PARTFORSCALE = "LowerTorso"
-end
-if type(CHOOSECUSTOMPOSE) ~= "string" or CHOOSECUSTOMPOSE == nil then
-    CHOOSECUSTOMPOSE = "T-Pose"
-end
-if type(CHOOSESTANDPOSE) ~= "string" or CHOOSESTANDPOSE == nil then
-    CHOOSESTANDPOSE = CHOOSECUSTOMPOSE
-end
-if type(SPECTATORKEY) ~= "string" or SPECTATORKEY == nil then
-    SPECTATORKEY = "J"
-end
-if type(FINDSTANDS) ~= "table" or FINDSTANDS == {} or FINDSTANDS == nil then
+    CUSTOMPOSE = false,
+    PARTFORSCALE = "LowerTorso",
+    CHOOSECUSTOMPOSE = "T-Pose",
+    CHOOSESTANDPOSE = nil,
+    SPECTATORKEY = "J",
+    FATPLAYERSSIZE = 3,
+    THINFRIENDSSIZE = 0.3,
+
     FINDSTANDS = {
-        -- ["Star platinum"] = true,
-        -- ["Hermit Purple"] = true,
-        -- ["Golden Experience"] = true,
-        -- ["Crazy Diamond"] = true,
-        -- ["Stone Free"] = true,
-    }
-end
-if type(FINDSPECS) ~= "table" or FINDSPECS == {} or FINDSPECS == nil then
+        ["Star Platinum"] = true,
+        ["Hermit Purple"] = true,
+        ["Gold Experience"] = true,
+        ["Crazy Diamond"] = true,
+        ["Stone Free"] = true,
+    },
     FINDSPECS = {
         ["Boxing"] = false,
-        ["Hamon (Caesar Zeppeli)"] = true,
+        ["Hamon (Caesar Zeppeli)"] = false,
         ["Hamon (Jonathan Joestar)"] = true,
         ["Hamon (Joseph Joestar)"] = true,
-        ["Hamon (William Zeppeli)"] = true,
+        ["Hamon (William Zeppeli)"] = false,
         ["Spin"] = false,
         ["SwordStyle"] = false,
-        ["Vampirism"] = false,}
+        ["Vampirism"] = false,
+    },
+}
+for setting, default in pairs(DefaultSettings) do
+    local Gsetting = getfenv()[setting]
+    if Gsetting == nil or type(Gsetting) ~= type(default) or Gsetting == 0 or Gsetting == {} then
+        getfenv()[setting] = default
+    end
 end
+
+-- end
+-- if type(FUNSOUNDS) ~= "boolean" or FUNSOUNDS == nil then
+--     FUNSOUNDS = true
+-- end
+-- if type(PETUHVIEW) ~= "boolean" or PETUHVIEW == nil then
+--     PETUHVIEW = true
+-- end
+-- if type(IMPALEGLITCHFLAG) ~= "boolean" or IMPALEGLITCHFLAG == nil then
+--     IMPALEGLITCHFLAG = true
+-- end
+-- if type(MARKERTOGGLE) ~= "boolean" or MARKERTOGGLE == nil then
+--     MARKERTOGGLE = false
+-- end
+-- if type(AIM) ~= "boolean" or AIM == nil then
+--     AIM = true
+-- end
+-- if type(BBINDICATOR) ~= "boolean" or BBINDICATOR == nil then
+--     BBINDICATOR = true
+-- end
+-- if type(STANDSKILLSPRIORITY) ~= "boolean" or STANDSKILLSPRIORITY == nil then
+--     STANDSKILLSPRIORITY = false
+-- end
+-- if type(CUSTOMPOSE) ~= "boolean" or CUSTOMPOSE == nil then
+--     CUSTOMPOSE = false
+-- end
+-- if type(FINDSTANDSANDSPECS) ~= "boolean" or FINDSTANDSANDSPECS == nil then
+--     FINDSTANDSANDSPECS = true
+-- end
+-- if type(HPINDICATOR) ~= "boolean" or HPINDICATOR == nil then
+--     HPINDICATOR = true
+-- end
+-- if type(TSNOTIFER) ~= "boolean" or TSNOTIFER == nil then
+--     TSNOTIFER = true
+-- end
+-- if type(FINDALLPLAYERS) ~= "boolean" or FINDALLPLAYERS == nil then
+--     FINDALLPLAYERS = true
+-- end
+
+
+-- if type(ADDTORUNSPEED) ~= "number" or ADDTORUNSPEED == nil then
+--     ADDTORUNSPEED = 11
+-- end
+-- if type(MARKERRENDERDISTANCE) ~= "number" or MARKERRENDERDISTANCE == nil then
+--     MARKERRENDERDISTANCE = 200
+-- end
+-- if type(FATPLAYERSSIZE) ~= "number" or FATPLAYERSSIZE == 0 or FATPLAYERSSIZE == nil then
+--     FATPLAYERSSIZE = 2
+-- end
+-- if type(THINFRIENDSSIZE) ~= "number" or THINFRIENDSSIZE == 0 or THINFRIENDSSIZE == nil then
+--     THINFRIENDSSIZE = 0.3
+-- end
+
+-- if type(PARTFORSCALE) ~= "string" or PARTFORSCALE == nil then
+--     PARTFORSCALE = "LowerTorso"
+-- end
+-- if type(CHOOSECUSTOMPOSE) ~= "string" or CHOOSECUSTOMPOSE == nil then
+--     CHOOSECUSTOMPOSE = "T-Pose"
+-- end
+-- if type(CHOOSESTANDPOSE) ~= "string" or CHOOSESTANDPOSE == nil then
+--     CHOOSESTANDPOSE = CHOOSECUSTOMPOSE
+-- end
+-- if type(SPECTATORKEY) ~= "string" or SPECTATORKEY == nil then
+--     SPECTATORKEY = "J"
+-- end
+-- if type(FINDSTANDS) ~= "table" or FINDSTANDS == {} or FINDSTANDS == nil then
+--     FINDSTANDS = {
+--         ["Star Platinum"] = true,
+--         ["Hermit Purple"] = true,
+--         ["Gold Experience"] = true,
+--         ["Crazy Diamond"] = true,
+--         ["Stone Free"] = true,
+--     }
+-- end
+-- if type(FINDSPECS) ~= "table" or FINDSPECS == {} or FINDSPECS == nil then
+--     FINDSPECS = {
+--         ["Boxing"] = false,
+--         ["Hamon (Caesar Zeppeli)"] = false,
+--         ["Hamon (Jonathan Joestar)"] = true,
+--         ["Hamon (Joseph Joestar)"] = true,
+--         ["Hamon (William Zeppeli)"] = false,
+--         ["Spin"] = false,
+--         ["SwordStyle"] = false,
+--         ["Vampirism"] = false,}
+-- end
 
 
 
@@ -376,8 +435,9 @@ local ToggleStand = function (toggle)
     end
 end
 local StandOnConnection
+local StandOnKeyCode = plr.PlayerStats.StandKey.Value
 StandOnConnection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if input.KeyCode == Enum.KeyCode.Q and not gameProcessed then
+    if input.KeyCode == Enum.KeyCode[StandOnKeyCode] and not gameProcessed then
         if plrCharacter then
             local standMorph = plrCharacter:FindFirstChild("StandMorph")
             local soundFound
@@ -394,7 +454,7 @@ StandOnConnection = UserInputService.InputBegan:Connect(function(input, gameProc
             end
             if (not IsStand.Value or IsStand.Value and soundFound) then
                 print("Enabling stand...")
-                while(plrCharacter.SummonedStand and IsStand.Value) do wait(0.1); print("waiting cd...") end
+                while(plrCharacter and plrCharacter.SummonedStand and IsStand.Value) do wait(0.1); print("waiting cd...") end
                 while plrCharacter and not IsStand.Value do OneFrameWait(); ToggleStand("On") end
             end
         end
@@ -1127,25 +1187,55 @@ StatsObject.new = function ()
     self.speakerGui = PlayerGui
 
     self.SoundStorage = {
-        ["m2"] =
-        {
-            Id = "rbxassetid://163619849",
+        ["m2"] = {
+            Id = "163619849",
+        },
+        ["Tornado Overdrive"] = {
+            Id = "92226065106551"
+        },
+        ["Sendo Overdrive"] = {
+            Id = "12074012329"
+        },
+        ["William Hamon Charge"] = {
+            Id = "127153643941446",
+        },
+        ["Zoom Punch Voice"] = {
+            Id = "118514641514532",
         },
         ["fart with reverb"] =
         {
-            Id = "rbxassetid://6857250477",
-            PlaybackRegionsEnabled = true,
+            Id = "6857250477",
             PlaybackRegion = NumberRange.new(0,1),
-            Volume = 10,
-        },
-        ["Tornado Overdrive"] = {
-            Id = "rbxassetid://119792224644266"
+            VolumeMultiplier = 2,
         },
         ["fart meme"] = {
-            Id = "rbxassetid://4809574295",
-            Volume = 10,
-        }
+            Id = "4809574295",
+            Delay = 0,
+            VolumeMultiplier = 2,
+        },
+        ["chinese victory"] = {
+            Id = "7346078859",
+            -- PlaybackRegion = NumberRange.new(0.1,5),
+            VolumeMultiplier = 3,
+        },
+        ["Chinese punch"] = {
+            Id = "8383718211",
+            VolumeMultiplier = 3,
+        },
     }
+
+    self.SoundReplaceList = {
+        -- ["Ora Kicks"] = "Fart1"
+        ["m2"] = "fart with reverb",
+        -- ["Tornado Overdrive"] = "fart meme",
+        ["William Hamon Charge"] = "chinese victory",
+        ["Zoom Punch Voice"] = "Chinese punch",
+        ["Sendo Overdrive"] = "fart meme",
+    }
+
+    for _, v in pairs(self.SoundStorage) do
+        v.Id = "rbxassetid://"..v.Id
+    end
 
     self.SoundNameWithParam = function (param, value)
         for key, table in pairs(self.SoundStorage) do
@@ -1188,12 +1278,17 @@ StatsObject.new = function ()
             -- warn(`holder {i} disconnected in {character.Name}`)
         end
         self.charContainer[character] = nil
+        wait(30)
+        if character and not self.IsCharacterExists(character) then
+            warn(`{character.Name} destroyed`)
+            character:Destroy()
+        end
         -- warn(`Character {character.Name} removed from table`)
     end
 
     self.CanTs = function (character)
         if not character then return end
-        local standkills = character:WaitForChild("StandSkills" ,5)
+        local standkills = character:FindFirstChild("StandSkills")
         if not standkills then return false end
         for _, skill in pairs(standkills:GetChildren()) do
             if skill.Value == "The World" then
@@ -1206,7 +1301,7 @@ StatsObject.new = function ()
     self.IsAnimation = function (humanoid, animationID)
         if not humanoid then return end
         if humanoid then
-            local animator = humanoid:WaitForChild("Animator",3)
+            local animator = humanoid:FindFirstChild("Animator")
             for _, track in pairs(animator:GetPlayingAnimationTracks()) do
                 if track.Animation.AnimationId  == animationID then
                     return true
@@ -1237,6 +1332,7 @@ StatsObject.new = function ()
         for character, _ in pairs(self.charContainer) do
             self.DeleteCharacter(character)
         end
+        return
     end
     return self
 end
@@ -1274,53 +1370,55 @@ function StatsObject:StartMonitoringCharacter(character)
         end)
     end
     --- TS NOTIFER
-    Holders["TsNotiferHolder"] = RunService.Stepped:Connect(function ()
-        local summonedStand = character:FindFirstChild("SummonedStand")
-        if not summonedStand or not summonedStand.Value then return end
-        local canTs = self.CanTs(character)
-        if not canTs then return end
-        local okDistance = self.speaker:DistanceFromCharacter(PrimaryPart.Position) < 200
-        if not okDistance then return end
-        local animationController = character:WaitForChild("StandMorph"):WaitForChild("AnimationController",5)
-        local isTsAnim = self.IsAnimation(animationController, "rbxassetid://4139325504")
-        if isTsAnim then
-            self:CreateTsNotifer(character)
+    if TSNOTIFER then
+        Holders["TsNotiferHolder"] = RunService.Stepped:Connect(function ()
+            local summonedStand = character:FindFirstChild("SummonedStand")
+            if not summonedStand or not summonedStand.Value then return end
+            local canTs = self.CanTs(character)
+            if not canTs then return end
+            local okDistance = self.speaker:DistanceFromCharacter(PrimaryPart.Position) < 200
+            if not okDistance then return end
+            local standMorph = character:FindFirstChild("StandMorph")
+            if not standMorph then return end
+            local animationController = standMorph:FindFirstChild("AnimationController")
+            if not animationController then return end
+            local isTsAnim = self.IsAnimation(animationController, "rbxassetid://4139325504")
+            if isTsAnim then
+                self:CreateTsNotifer(character)
+            end
+        end)
+    end
+    
+    if BBINDICATOR then
+        local BlockBreakListening = function()
+            if character.Blocking_Capacity.Value ~= 0 then return end
+            if not self.charContainer[character] or self.charContainer[character].StunBar then return end
+            local attach = character:FindFirstChild("UpperTorso"):WaitForChild("HitAttach",0.03) -- !!!!!!!
+            local stunned = self.IsInStun(character)
+            if not stunned then return end
+            -- warn(character.Name,"stunned", stunned)
+            if attach then
+                local bb = self.IsBlockBreak(attach)
+                if bb then
+                    self:CreateStunBar(character, "bb")
+                    return
+                end
+            else
+                -- warn(character.Name,"bypassed block", stunned)
+                self:CreateStunBar(character, "bypassb")
+            end
         end
-    end)
-    
-    
-    
-    local BlockBreakListening = function()
-        if character.Blocking_Capacity.Value ~= 0 then return end
-        if not self.charContainer[character] or self.charContainer[character].StunBar then return end
-        local attach = character:FindFirstChild("UpperTorso"):WaitForChild("HitAttach",0.03) -- !!!!!!!
-        local stunned = self.IsInStun(character)
-        if not stunned then return end
-        -- warn(character.Name,"stunned", stunned)
-        if attach then
-            local bb = self.IsBlockBreak(attach)
-            if bb then
-                self:CreateStunBar(character, "bb")
+        local PerfectBlockListening = function()
+            if not self.charContainer[character] or self.charContainer[character].StunBar then return end
+            local stunned = self.IsInStun(character)
+            if not stunned then return end
+            local attach = character:FindFirstChild("UpperTorso"):WaitForChild("HitAttach",0.03)
+            local pb = self.IsPerfectBlock(attach)
+            if stunned and pb then
+                self:CreateStunBar(character, "pb")
                 return
             end
-        else
-            -- warn(character.Name,"bypassed block", stunned)
-            self:CreateStunBar(character, "bypassb")
         end
-    end
-    local PerfectBlockListening = function()
-        if not self.charContainer[character] or self.charContainer[character].StunBar then return end
-        local stunned = self.IsInStun(character)
-        if not stunned then return end
-        local attach = character:FindFirstChild("UpperTorso"):WaitForChild("HitAttach",0.03)
-        local pb = self.IsPerfectBlock(attach)
-        if stunned and pb then
-            self:CreateStunBar(character, "pb")
-            return
-        end
-    end
-
-    if BBINDICATOR then
         local bc = character:WaitForChild("Blocking_Capacity",60)
         if bc then
             Holders["StunBarBbHolder"] = bc:GetPropertyChangedSignal("Value"):Connect(function ()
@@ -1339,11 +1437,10 @@ function StatsObject:CreateFindStandsAndSpec(character)
     if not charactersPlayer then return end
     local characterStats = charactersPlayer:WaitForChild("PlayerStats", 20)
     if not characterStats then return end
-
-    wait(3)
-    local Stand = characterStats.Stand.Value
-    local Spec  = characterStats.Spec.Value
+    local Stand = characterStats:WaitForChild("Stand",5).Value
+    local Spec  = characterStats:WaitForChild("Spec",5).Value
     local IsStand, IsSpec = FINDSTANDS[Stand], FINDSPECS[Spec]
+    if FINDALLPLAYERS == true then IsStand, IsSpec = true, true end
     if not (IsStand or IsSpec) then return end
     self.charContainer[character].FindStandsAndSpec = true
 
@@ -1361,7 +1458,7 @@ function StatsObject:CreateFindStandsAndSpec(character)
     CharName.TextColor3 = Color3.fromRGB(255, 0, 0)
     CharName.TextStrokeTransparency = 0
     CharName.Font = Enum.Font.SourceSansBold
-    CharName.TextSize = 40
+    CharName.TextSize = 15
     CharName.Text = string.format("Name: %q \n\n\n\n", character.Name)
 
     local FindStand
@@ -1373,8 +1470,8 @@ function StatsObject:CreateFindStandsAndSpec(character)
         FindStand.TextColor3 = Color3.fromRGB(245, 166, 35)
         FindStand.TextStrokeTransparency = 0
         FindStand.Font = Enum.Font.SourceSansBold
-        FindStand.TextSize = 30
-        FindStand.Text = string.format("HP: %q \n\n", Stand)
+        FindStand.TextSize = 15
+        FindStand.Text = string.format("Stand: %q \n\n", Stand)
     end
 
     local FindSpec
@@ -1386,7 +1483,7 @@ function StatsObject:CreateFindStandsAndSpec(character)
         FindSpec.TextColor3 = Color3.fromRGB(255, 255, 0)
         FindSpec.TextStrokeTransparency = 0
         FindSpec.Font = Enum.Font.SourceSansBold
-        FindSpec.TextSize = 30
+        FindSpec.TextSize = 15
         FindSpec.Text = string.format("Spec: %q", Spec)
     end
 
@@ -1420,13 +1517,8 @@ function StatsObject:CreateSoundReplacer(character)
 
     local SoundStorage = self.SoundStorage
     local SoundNameWithParam = self.SoundNameWithParam
-
+    local SoundReplaceList = self.SoundReplaceList
     -- ["original sound id"] = "custom sound id" -- "original sound" to "custom sound"
-    local SoundReplaceList = {
-        -- ["Ora Kicks"] = "Fart1"
-        ["m2"] = "fart with reverb",
-        ["Tornado Overdrive"] = "fart meme"
-    }
 
     local ReplaceSound = function (originalSoundObject)
         local nameOfOriginalSoundObject = SoundNameWithParam("Id", originalSoundObject.SoundId)
@@ -1434,13 +1526,14 @@ function StatsObject:CreateSoundReplacer(character)
         if not customSoundName then warn(`no customSoundName`); return end
         local newSound = Instance.new("Sound", originalSoundObject)
         newSound.SoundId = SoundStorage[customSoundName]["Id"]
-        newSound.Volume = originalSoundObject.Volume * (SoundStorage[customSoundName].Volume or 1)
+        newSound.Volume = originalSoundObject.Volume * (SoundStorage[customSoundName].VolumeMultiplier or 1)
         newSound.Looped = originalSoundObject.Looped
-        newSound.PlaybackRegionsEnabled = SoundStorage[customSoundName].PlaybackRegionsEnabled or false
+        newSound.PlaybackRegionsEnabled = SoundStorage[customSoundName].PlaybackRegion ~= nil
         newSound.PlaybackRegion = SoundStorage[customSoundName].PlaybackRegion or NumberRange.new(0, 200)
 
-        newSound.Playing = true
         originalSoundObject.Volume = 0
+        wait(SoundStorage[customSoundName].Delay or 0)
+        newSound.Playing = true
     end
 
     local Updater
@@ -1452,6 +1545,8 @@ function StatsObject:CreateSoundReplacer(character)
         if self.charContainer[character] then
             self.charContainer[character].SoundReplacer = false
         end
+        SoundNameWithParam = nil -- for gc
+        SoundStorage = nil
     end
 
     local Update = function (descendant)
@@ -1511,7 +1606,7 @@ function StatsObject:CreateRealPosMarker(character)
         end
     end
     local Update = function ()
-        if MarkerWeld and self.charContainer[character] and self.charContainer[character].RealPosMarker and character.HumanoidRootPart then
+        if MarkerWeld and self.charContainer[character] and self.charContainer[character].RealPosMarker and character:FindFirstChild("HumanoidRootPart") then
             local offset = character.HumanoidRootPart.CFrame:VectorToObjectSpace(character.HumanoidRootPart.AssemblyLinearVelocity) * GetPing()/1000 * 1
             MarkerWeld.C0 = CFrame.new(offset) * CFrame.Angles(math.rad(90),math.rad(90),0)
         else
@@ -1553,7 +1648,7 @@ function StatsObject:CreateTsNotifer(character)
     TsText.TextScaled = true
 
     local Destroy = function ()
-        while Gui and RunService.Stepped:Wait() do -- JJSploit иногда сразу не удаляет, потому цикл
+        if Gui then -- JJSploit иногда сразу не удаляет
             Gui:Destroy()
         end
         if self.charContainer[character] then
@@ -1654,8 +1749,6 @@ function StatsObject:CreateHpIndicator(character)
     HealthText.TextStrokeTransparency = 0
     HealthText.Font = Enum.Font.SourceSansBold
     HealthText.TextSize = 24
-    local Health = character:WaitForChild("Health", 10)
-    HealthText.Text = string.format("HP: %d / %d", character.Health.Value, character.Health.MaxValue)
 
     local Updater
     local Destroy = function ()
@@ -1689,16 +1782,16 @@ end
 
 
 
--- local PlayersControlContainer = StatsObject.new()
--- local PlayersControlContainerConnection
--- PlayersControlContainerConnection = living.ChildAdded:Connect(function(child)
---     PlayersControlContainer:StartMonitoringCharacter(child)
--- end)
--- for _, v in pairs(living:GetChildren()) do
---     spawn(function ()
---         PlayersControlContainer:StartMonitoringCharacter(v)
---     end)
--- end
+local PlayersControlContainer = StatsObject.new()
+local PlayersControlContainerConnection
+PlayersControlContainerConnection = living.ChildAdded:Connect(function(child)
+    PlayersControlContainer:StartMonitoringCharacter(child)
+end)
+for _, v in pairs(living:GetChildren()) do
+    spawn(function ()
+        PlayersControlContainer:StartMonitoringCharacter(v)
+    end)
+end
 ---
 
 
