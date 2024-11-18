@@ -41,6 +41,8 @@
 --     ["Vampirism"] = true,
 -- }
 
+-- print("Loading freeRunScript")
+-- loadstring(game:HttpGet("https://raw.githubusercontent.com/BULLOriginal/YBA-scripts/refs/heads/main/---%20free%20run%20script.lua", true))()
 
 local DefaultSettings = {
     FUNSOUNDS = true,
@@ -1330,7 +1332,9 @@ StatsObject.new = function ()
 
     self.Destroy = function ()
         for character, _ in pairs(self.charContainer) do
-            self.DeleteCharacter(character)
+            spawn(function ()
+                self.DeleteCharacter(character)
+            end)
         end
         return
     end
