@@ -25,10 +25,10 @@
 
 -- FINDSTANDS = {
 --     ["Star Platinum"] = true,
-    -- ["Hermit Purple"] = true,
-    -- ["Gold Experience"] = true,
-    -- ["Crazy Diamond"] = true,
-    -- ["Stone Free"] = true,
+--     ["Hermit Purple"] = true,
+--     ["Gold Experience"] = true,
+--     ["Crazy Diamond"] = true,
+--     ["Stone Free"] = true,
 -- }
 -- FINDSPECS = {
 --     ["Boxing"] = true,
@@ -1177,7 +1177,7 @@ end
 
 -------
 
---- Stats module test
+--- Stats module
 
 local StatsObject = {}
 StatsObject.__index = StatsObject
